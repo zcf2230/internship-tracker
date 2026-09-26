@@ -44,7 +44,7 @@ function companiesFrom(file) {
       salary: c.salary || "",
       housing: c.housing || "",
       retention: c.retention || "",
-      applyLink: (c.applyLink || "").startsWith("http") ? c.applyLink : "",
+      applyLink: (String(c.applyLink || "").match(/^https?:\/\/[^\s（(，,]+/) || [""])[0],
       referral: c.referral || "",
       source: c.source || "",
       confidence: ["高", "中", "低"].includes(c.confidence) ? c.confidence : "低"
