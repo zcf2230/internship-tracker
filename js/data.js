@@ -1810,7 +1810,7 @@ window.DATA = {
   {
    "id": "banks-0",
    "name": "工商银行",
-   "category": "银行",
+   "category": "银行/保险/信托",
    "subcategory": "国有大行",
    "cities": [
     "北京",
@@ -1849,7 +1849,7 @@ window.DATA = {
   {
    "id": "banks-1",
    "name": "农业银行",
-   "category": "银行",
+   "category": "银行/保险/信托",
    "subcategory": "国有大行",
    "cities": [
     "北京",
@@ -1888,7 +1888,7 @@ window.DATA = {
   {
    "id": "banks-2",
    "name": "中国银行",
-   "category": "银行",
+   "category": "银行/保险/信托",
    "subcategory": "国有大行",
    "cities": [
     "北京",
@@ -1927,7 +1927,7 @@ window.DATA = {
   {
    "id": "banks-3",
    "name": "建设银行",
-   "category": "银行",
+   "category": "银行/保险/信托",
    "subcategory": "国有大行",
    "cities": [
     "北京",
@@ -1966,7 +1966,7 @@ window.DATA = {
   {
    "id": "banks-4",
    "name": "交通银行",
-   "category": "银行",
+   "category": "银行/保险/信托",
    "subcategory": "国有大行",
    "cities": [
     "上海",
@@ -2005,7 +2005,7 @@ window.DATA = {
   {
    "id": "banks-5",
    "name": "邮储银行",
-   "category": "银行",
+   "category": "银行/保险/信托",
    "subcategory": "国有大行",
    "cities": [
     "北京",
@@ -2044,7 +2044,7 @@ window.DATA = {
   {
    "id": "banks-6",
    "name": "招商银行",
-   "category": "银行",
+   "category": "银行/保险/信托",
    "subcategory": "股份制银行",
    "cities": [
     "深圳",
@@ -2083,7 +2083,7 @@ window.DATA = {
   {
    "id": "banks-7",
    "name": "中信银行",
-   "category": "银行",
+   "category": "银行/保险/信托",
    "subcategory": "股份制银行",
    "cities": [
     "北京",
@@ -2122,7 +2122,7 @@ window.DATA = {
   {
    "id": "banks-8",
    "name": "兴业银行",
-   "category": "银行",
+   "category": "银行/保险/信托",
    "subcategory": "股份制银行",
    "cities": [
     "福州",
@@ -2161,7 +2161,7 @@ window.DATA = {
   {
    "id": "banks-9",
    "name": "浦发银行",
-   "category": "银行",
+   "category": "银行/保险/信托",
    "subcategory": "股份制银行",
    "cities": [
     "上海",
@@ -2200,7 +2200,7 @@ window.DATA = {
   {
    "id": "banks-10",
    "name": "民生银行",
-   "category": "银行",
+   "category": "银行/保险/信托",
    "subcategory": "股份制银行",
    "cities": [
     "北京",
@@ -2240,7 +2240,7 @@ window.DATA = {
   {
    "id": "banks-11",
    "name": "光大银行",
-   "category": "银行",
+   "category": "银行/保险/信托",
    "subcategory": "股份制银行",
    "cities": [
     "北京",
@@ -2279,7 +2279,7 @@ window.DATA = {
   {
    "id": "banks-12",
    "name": "平安银行",
-   "category": "银行",
+   "category": "银行/保险/信托",
    "subcategory": "股份制银行",
    "cities": [
     "深圳",
@@ -2318,7 +2318,7 @@ window.DATA = {
   {
    "id": "banks-13",
    "name": "浙商银行",
-   "category": "银行",
+   "category": "银行/保险/信托",
    "subcategory": "股份制银行（总部杭州）",
    "cities": [
     "杭州",
@@ -2357,7 +2357,7 @@ window.DATA = {
   {
    "id": "banks-14",
    "name": "杭州银行",
-   "category": "银行",
+   "category": "银行/保险/信托",
    "subcategory": "城商行（总部杭州）",
    "cities": [
     "杭州"
@@ -2394,7 +2394,7 @@ window.DATA = {
   {
    "id": "banks-15",
    "name": "宁波银行",
-   "category": "银行",
+   "category": "银行/保险/信托",
    "subcategory": "城商行",
    "cities": [
     "宁波",
@@ -2433,7 +2433,7 @@ window.DATA = {
   {
    "id": "banks-16",
    "name": "杭州联合农商银行",
-   "category": "银行",
+   "category": "银行/保险/信托",
    "subcategory": "农商行（总部杭州）",
    "cities": [
     "杭州"
@@ -2470,7 +2470,7 @@ window.DATA = {
   {
    "id": "banks-17",
    "name": "中国人寿",
-   "category": "保险",
+   "category": "银行/保险/信托",
    "subcategory": "保险（国有寿险龙头）",
    "cities": [
     "北京",
@@ -2509,7 +2509,7 @@ window.DATA = {
   {
    "id": "banks-18",
    "name": "中国平安",
-   "category": "保险",
+   "category": "银行/保险/信托",
    "subcategory": "保险（综合金融集团）",
    "cities": [
     "深圳",
@@ -2549,7 +2549,7 @@ window.DATA = {
   {
    "id": "banks-19",
    "name": "太平洋保险（中国太保）",
-   "category": "保险",
+   "category": "银行/保险/信托",
    "subcategory": "保险",
    "cities": [
     "上海",
@@ -2588,7 +2588,7 @@ window.DATA = {
   {
    "id": "banks-20",
    "name": "新华保险",
-   "category": "保险",
+   "category": "银行/保险/信托",
    "subcategory": "保险",
    "cities": [
     "北京",
@@ -2627,7 +2627,7 @@ window.DATA = {
   {
    "id": "banks-21",
    "name": "泰康保险",
-   "category": "保险",
+   "category": "银行/保险/信托",
    "subcategory": "保险",
    "cities": [
     "北京",
@@ -2666,7 +2666,7 @@ window.DATA = {
   {
    "id": "banks-22",
    "name": "中信信托",
-   "category": "信托",
+   "category": "银行/保险/信托",
    "subcategory": "信托",
    "cities": [
     "北京"
@@ -2703,7 +2703,7 @@ window.DATA = {
   {
    "id": "banks-23",
    "name": "平安信托",
-   "category": "信托",
+   "category": "银行/保险/信托",
    "subcategory": "信托",
    "cities": [
     "深圳"
@@ -2740,7 +2740,7 @@ window.DATA = {
   {
    "id": "banks-24",
    "name": "国银金融租赁",
-   "category": "信托",
+   "category": "银行/保险/信托",
    "subcategory": "金融租赁（国开行旗下）",
    "cities": [
     "深圳"
@@ -2777,7 +2777,7 @@ window.DATA = {
   {
    "id": "banks-25",
    "name": "工银金融租赁",
-   "category": "信托",
+   "category": "银行/保险/信托",
    "subcategory": "金融租赁（工商银行旗下）",
    "cities": [
     "北京"
