@@ -67,6 +67,8 @@ if (fs.existsSync(chFile)) {
   channels = ch.channels || ch || {};
   guides = ch.guides || [];
 }
+const guidesFile = path.join(RAW, "guides.json");
+if (fs.existsSync(guidesFile)) guides = JSON.parse(fs.readFileSync(guidesFile, "utf8"));
 
 const data = { updatedAt: "2026-09-26", companies, channels, guides };
 const js = "/* 本文件由 tools/build-data.js 生成，编辑请改 tools/raw/ 下源文件后重新生成 */\nwindow.DATA = " + JSON.stringify(data, null, 1) + ";\n";

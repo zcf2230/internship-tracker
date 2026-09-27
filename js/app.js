@@ -114,6 +114,9 @@
   function isBachelorOk(c) {
     return /本科可投|本科即可|本科在读可投|本科生可投|学历不限|不限学历|本科及以上|本科为主|对本科/.test(String(c.degree || ""));
   }
+  function isMasterOnly(c) {
+    return !isBachelorOk(c) && /硕士|研究生/.test(String(c.degree || ""));
+  }
   function hasTest(c) {
     var t = String(c.writtenTest || "").trim();
     if (!t) return null;
@@ -133,6 +136,7 @@
       if (!has) return false;
     }
     if (filters.degree === "bachelor-ok" && !isBachelorOk(c)) return false;
+    if (filters.degree === "master" && !isMasterOnly(c)) return false;
     if (filters.test === "yes" && hasTest(c) !== true) return false;
     if (filters.test === "no" && hasTest(c) !== false) return false;
     if (filters.hz === "hz" && (c.cities || []).indexOf("杭州") < 0) return false;
@@ -158,8 +162,22 @@
     $("#categoryFilters").innerHTML = cats.map(function (cat) {
       return '<button class="chip" data-cat="' + esc(cat) + '">' + esc(cat) + "</button>";
     }).join("");
-    $("#cityFilter").innerHTML = '<option value="">全部城市</option>' + ["杭州", "上海", "北京", "深圳", "广州"].map(function (ct) {
-      return '<option value="' + ct + '">' + ct + "</option>";
+    // 城市下拉 = 高频真实城市 + 固定重点城市（含嘉兴），按岗位数排序
+    var cityCount = {};
+    DATA.companies.forEach(function (c) {
+      (c.cities || []).forEach(function (ct) {
+        if (/全国|多地|以官网|以岗位|城市$/.test(ct)) return;
+        cityCount[ct] = (cityCount[ct] || 0) + 1;
+      });
+    });
+    ["杭州", "嘉兴"].forEach(function (ct) { cityCount[ct] = (cityCount[ct] || 0) + 1; });
+    var cityList = Object.keys(cityCount).sort(function (a, b) {
+      if (a === "杭州") return -1; if (b === "杭州") return 1;
+      if (a === "嘉兴") return -1; if (b === "嘉兴") return 1;
+      return cityCount[b] - cityCount[a];
+    }).slice(0, 22);
+    $("#cityFilter").innerHTML = '<option value="">全部城市</option>' + cityList.map(function (ct) {
+      return '<option value="' + esc(ct) + '">' + esc(ct) + (cityCount[ct] > 1 ? " (" + cityCount[ct] + ")" : "") + "</option>";
     }).join("");
     $("#timelineCategory").innerHTML = '<option value="">全部行业</option>' + cats.map(function (cat) {
       return '<option value="' + esc(cat) + '">' + esc(cat) + "</option>";
@@ -198,6 +216,7 @@
         '<div class="card-actions">' +
           '<button class="btn" data-detail="' + esc(c.id) + '">详情 / 要求</button>' +
           (c.applyLink ? '<a class="btn apply" href="' + esc(c.applyLink) + '" target="_blank" rel="noopener">官网网申 ↗</a>' : "") +
+          '<a class="btn secondary" href="https://www.bing.com/search?q=' + encodeURIComponent(c.name + " 实习生招聘 官方网申") + '" target="_blank" rel="noopener" title="打不开官网链接时，用必应搜该公司官方招聘入口">🔍 搜官方入口</a>' +
           '<span class="progress-mini" data-company="' + esc(c.id) + '">' +
             STAGES.map(function (s) {
               return '<button data-stage="' + s.key + '" class="' + (pg.stage === s.key ? "on " + (s.key === "offer" ? "done" : s.key === "drop" ? "drop" : "") : "") + '">' + s.label + "</button>";
@@ -304,20 +323,27 @@
     function card(title, items) {
       if (!items || !items.length) return "";
       return '<div class="chan-card"><h3>' + title + "</h3><ul>" + items.map(function (x) {
-        return "<li><b>" + esc(x.org || x.name || x.type || "") + "</b> " + esc(x.channel || x.note || "") +
-          (x.url ? ' <a href="' + esc(x.url) + '" target="_blank" rel="noopener">' + esc(x.url.replace(/^https?:\/\//, "")) + "</a>" : "") +
+        return "<li><b>" + esc(x.org || x.name || x.type || "") + "</b> " + esc((x.channel || "").replace(/官网：?https?:\/\/\S+/g, "").trim() || x.note || "") +
+          (x.url ? ' <a href="' + esc(x.url) + '" target="_blank" rel="noopener">直达官网 ↗</a>' : "") +
           (x.note && (x.org || x.name || x.type) ? "<span>" + esc(x.note) + "</span>" : "") + "</li>";
       }).join("") + "</ul></div>";
     }
     var html = "";
-    if (ch.official) html += card("🏛 官方招聘公众号（部分）", ch.official);
+    if (ch.official) html += card("🏛 官方招聘公众号与官网入口（部分）", ch.official);
     if (ch.platforms) html += card("🌐 权威信息平台", ch.platforms);
     if (ch.referral) html += card("🤝 内推机制说明", ch.referral);
     $("#channelsWrap").innerHTML = html || '<p class="hint">数据加载中…</p>';
   }
   function renderGuides() {
     $("#guidesWrap").innerHTML = (DATA.guides || []).map(function (g) {
-      return '<div class="guide-card"><h3>' + esc(g.category) + "：" + esc(g.title || "") + "</h3><p>" + esc(g.content) + "</p></div>";
+      var res = (g.resources || []).map(function (r) {
+        if (!r || !r.url) return "";
+        var host = r.url.replace(/^https?:\/\/(www\.)?/, "").split("/")[0];
+        return '<li><span class="res-platform">' + esc(r.platform || host) + "</span> <a href=\"" + esc(r.url) + '" target="_blank" rel="noopener">' + esc(r.title || host) + "</a>" +
+          (r.note ? '<span class="res-note">' + esc(r.note) + "</span>" : "") + "</li>";
+      }).join("");
+      return '<div class="guide-card"><h3>' + esc(g.category) + "：" + esc(g.title || "") + "</h3><p>" + esc(g.content) + "</p>" +
+        (res ? '<h4 class="res-title">🔗 优质资源直达</h4><ul class="res-list">' + res + "</ul>" : "") + "</div>";
     }).join("") || '<p class="hint">数据加载中…</p>';
   }
 
@@ -409,6 +435,12 @@
     renderGuides();
     renderProgress();
     bindEvents();
+    // 返回顶部
+    var backTop = $("#backTop");
+    window.addEventListener("scroll", function () {
+      backTop.classList.toggle("show", window.scrollY > 600);
+    }, { passive: true });
+    backTop.onclick = function () { window.scrollTo({ top: 0, behavior: "smooth" }); };
   }
   document.addEventListener("DOMContentLoaded", init);
 })();

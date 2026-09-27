@@ -51,8 +51,9 @@
           <option>PTA</option><option>暑期实习</option>
         </select>
         <select id="degreeFilter">
-          <option value="">学历不限</option>
+          <option value="">全部学历</option>
           <option value="bachelor-ok">本科可投</option>
+          <option value="master">硕士及以上</option>
         </select>
         <select id="testFilter">
           <option value="">笔试不限</option>
@@ -118,13 +119,16 @@
   </div>
 </footer>
 
+<!-- 返回顶部 -->
+<button id="backTop" title="返回顶部">↑</button>
+
 <!-- 公司详情弹窗 -->
 <div id="modal" class="modal" hidden>
   <div class="modal-mask" id="modalMask"></div>
   <div class="modal-body" id="modalBody"></div>
 </div>
 
-<script src="js/data.js"></script>
-<script src="js/app.js"></script>
+<script src="js/data.js?v=3"></script>
+<script src="js/app.js?v=3"></script>
 </body>
 </html>

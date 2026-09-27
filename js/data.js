@@ -131,7 +131,7 @@ window.DATA = {
    "salary": "约150-400元/天（部门差异大）",
    "housing": "不包住宿，部分有餐补",
    "retention": "寒/暑期实习优秀者可留用，是校招offer主要来源",
-   "applyLink": "https://careers.cicc.com",
+   "applyLink": "https://cicc.zhiye.com",
    "referral": "中金公司招聘（微信公众号）",
    "source": "中金校招历史网申时间（2023届9月5日-11月11日）及投行部实习帖（网易/搜狐实习汇总）",
    "confidence": "中"
@@ -225,8 +225,8 @@ window.DATA = {
    "salary": "约100-300元/天",
    "housing": "不包住宿，部分有餐补",
    "retention": "优秀寒假实习生可直推暑期并争取留用",
-   "applyLink": "",
-   "referral": "国泰海通招聘（微信公众号；合并后官网招聘频道 campus.gtjas.com，具体入口以公众号为准）",
+   "applyLink": "https://campus.gtht.com",
+   "referral": "国泰海通招聘（微信公众号；校招系统 campus.gtht.com，原 gtjas.com 域名已停用）",
    "source": "国泰海通湖南分公司2027届校招简章（北京联合大学就业网2026-09）、总部2027届校招公告及校友寒假实习留用经验",
    "confidence": "低"
   },
@@ -455,7 +455,7 @@ window.DATA = {
    "salary": "约100-250元/天",
    "housing": "不包住宿，提供工作日午餐（研究所有先例）",
    "retention": "寒假实习优秀者可转正（公开信息明示）",
-   "applyLink": "",
+   "applyLink": "https://www.orientsec.com.cn",
    "referral": "东方证券招聘（微信公众号，官网招聘频道请从 orientsec.com.cn 进入）",
    "source": "北大光华CDC转载东方证券研究所寒假实习招聘（2021-01）及LinkedIn投行实习岗位",
    "confidence": "低"
@@ -593,7 +593,7 @@ window.DATA = {
    "salary": "约100-250元/天",
    "housing": "不包住宿，部分有餐补",
    "retention": "部分实习岗表现优异者可直通正式录用",
-   "applyLink": "",
+   "applyLink": "https://www.essence.com.cn",
    "referral": "国投证券招聘（微信公众号，官网人才招聘请从 essence.com.cn 进入）",
    "source": "国投证券投资经理助理实习岗JD（2026-04）及51job/牛客岗位信息",
    "confidence": "低"
@@ -685,7 +685,7 @@ window.DATA = {
    "salary": "约100-250元/天",
    "housing": "不包住宿，部分有餐补",
    "retention": "暑期实习优秀者可转正",
-   "applyLink": "",
+   "applyLink": "https://www.gjzq.com.cn",
    "referral": "国金证券招聘（微信公众号，官网招聘请从 gjzq.com.cn 进入）",
    "source": "国金证券2026暑期实习暨2027届校招（4月启动、5月31日截止）及投行金睿计划2026暑期（5月1-29日网申）",
    "confidence": "中"
@@ -1495,8 +1495,8 @@ window.DATA = {
    "salary": "约150-300元/天",
    "housing": "无统一食宿",
    "retention": "中等，与平安集团校招联动",
-   "applyLink": "https://career.pingan.com",
-   "referral": "官方公众号「平安资产管理」/「平安招聘」（平安集团统一招聘平台）",
+   "applyLink": "https://campus.pingan.com",
+   "referral": "官方公众号「平安资产管理」/「平安招聘」（平安集团统一招聘平台 campus.pingan.com）",
    "source": "松鼠实习固收实习JD+中国平安2026中期报告校招数据（2027届）",
    "confidence": "低"
   },
@@ -4466,102 +4466,122 @@ window.DATA = {
    {
     "org": "中金公司",
     "channel": "公众号：中金公司招聘；官网投递：https://cicc.zhiye.com",
-    "note": "2027届校招及实习已启动，覆盖投行、研究、固收、私募股权等条线，投递以官网和微信认证号为准"
+    "note": "2027届校招及实习已启动，覆盖投行、研究、固收、私募股权等条线，投递以官网和微信认证号为准",
+    "url": "https://cicc.zhiye.com"
    },
    {
     "org": "中信证券",
     "channel": "公众号：中信证券招聘；官网：https://www.cs.ecitic.com（加入我们）",
-    "note": "总部2027校招宣讲已启动，公众号菜单'加入我们'可移动端投递"
+    "note": "总部2027校招宣讲已启动，公众号菜单'加入我们'可移动端投递",
+    "url": "https://careers.citics.com"
    },
    {
     "org": "中信建投证券",
     "channel": "公众号：中信建投证券招聘",
-    "note": "发布校招、暑期实习及分支机构岗位"
+    "note": "发布校招、暑期实习及分支机构岗位",
+    "url": "https://csc108.zhiye.com"
    },
    {
     "org": "华泰证券",
     "channel": "公众号：华泰证券招聘；官网：job.htsc.com.cn",
-    "note": "2027届校招已启动，含财富管理、机构业务及金融科技岗"
+    "note": "2027届校招已启动，含财富管理、机构业务及金融科技岗",
+    "url": "https://campus.htsc.com.cn"
    },
    {
     "org": "国泰海通",
     "channel": "公众号：国泰海通人才招聘",
-    "note": "原国泰君安+海通合并后新主体，2026年8月已开金融科技条线2027届校招"
+    "note": "原国泰君安+海通合并后新主体，2026年8月已开金融科技条线2027届校招",
+    "url": "https://campus.gtjas.com"
    },
    {
     "org": "招商证券",
     "channel": "公众号：招商证券招聘",
-    "note": "发布总部及分支机构校招、实习信息"
+    "note": "发布总部及分支机构校招、实习信息",
+    "url": "https://careers.newone.com.cn"
    },
    {
     "org": "广发证券",
     "channel": "公众号：广发证券招聘",
-    "note": "校招与金融科技专场招聘信息集中发布渠道"
+    "note": "校招与金融科技专场招聘信息集中发布渠道",
+    "url": "https://job.gf.com.cn/recruitment/campus"
    },
    {
     "org": "华夏基金",
     "channel": "公众号：华夏基金招聘",
-    "note": "发布投研、市场、运营条线校招与实习生岗位"
+    "note": "发布投研、市场、运营条线校招与实习生岗位",
+    "url": "https://chinaamc.zhiye.com"
    },
    {
     "org": "易方达基金",
     "channel": "公众号：易方达基金招聘（以微信认证账号为准）",
-    "note": "头部公募，投研/销售培训生实习信息发布"
+    "note": "头部公募，投研/销售培训生实习信息发布",
+    "url": "https://job.efunds.com.cn"
    },
    {
     "org": "中国工商银行",
     "channel": "公众号：中国工商银行人才招聘",
-    "note": "工行总行及分行校招统一报名入口，秋招每年9月左右启动"
+    "note": "工行总行及分行校招统一报名入口，秋招每年9月左右启动",
+    "url": "https://job.icbc.com.cn"
    },
    {
     "org": "招商银行",
     "channel": "公众号：招商银行招聘",
-    "note": "招行校招（含Fintech训练营）官方发布渠道"
+    "note": "招行校招（含Fintech训练营）官方发布渠道",
+    "url": "https://career.cmbchina.com"
    },
    {
     "org": "中国平安",
     "channel": "公众号：中国平安招聘",
-    "note": "平安集团及寿险、银行、资管子公司岗位汇总"
+    "note": "平安集团及寿险、银行、资管子公司岗位汇总",
+    "url": "https://campus.pingan.com"
    },
    {
     "org": "普华永道",
     "channel": "公众号：普华永道招聘；官网：https://www.pwccn.com/zh/careers/students.html",
-    "note": "官方声明从未授权第三方提供实习/内推，谨防付费内推诈骗"
+    "note": "官方声明从未授权第三方提供实习/内推，谨防付费内推诈骗",
+    "url": "https://www.pwccn.com/zh/careers/students.html"
    },
    {
     "org": "德勤",
     "channel": "公众号：德勤招聘（Deloitte）；官网：https://www.deloitte.com.cn（招聘栏目）",
-    "note": "校招、Club项目及寒暑假实习信息"
+    "note": "校招、Club项目及寒暑假实习信息",
+    "url": "https://www2.deloitte.com/cn/zh/careers.html"
    },
    {
     "org": "安永",
     "channel": "公众号：安永招聘；官网：EY Careers 校园招聘页",
-    "note": "SLP暑期领导力项目、秋招信息发布"
+    "note": "SLP暑期领导力项目、秋招信息发布",
+    "url": "https://www.ey.com/zh_cn/careers"
    },
    {
     "org": "毕马威",
     "channel": "公众号：毕马威招聘（KPMG）；官网：https://kpmg.com/cn 招聘页",
-    "note": "审计、咨询校招及实习网申入口"
+    "note": "审计、咨询校招及实习网申入口",
+    "url": "https://kpmg.com/cn/careers"
    },
    {
     "org": "腾讯",
     "channel": "公众号：腾讯招聘；官网：https://careers.tencent.com",
-    "note": "含金融科技（财付通/WeBank方向）、数据岗位实习生招聘"
+    "note": "含金融科技（财付通/WeBank方向）、数据岗位实习生招聘",
+    "url": "https://careers.tencent.com"
    },
    {
     "org": "蚂蚁集团",
     "channel": "公众号：蚂蚁集团招聘；官网：https://talent.antgroup.com",
-    "note": "支付宝/蚂蚁数科金融、数据、战略岗位实习与校招"
+    "note": "支付宝/蚂蚁数科金融、数据、战略岗位实习与校招",
+    "url": "https://talent.antgroup.com"
    },
    {
     "org": "字节跳动",
     "channel": "公众号：字节跳动招聘；官网：https://jobs.bytedance.com",
-    "note": "金融产品、数据分析和商业化岗位实习量大，日常实习随时投"
+    "note": "金融产品、数据分析和商业化岗位实习量大，日常实习随时投",
+    "url": "https://jobs.bytedance.com"
    },
    {
     "org": "美团",
     "channel": "公众号：美团招聘；官网：https://zhaopin.meituan.com",
-    "note": "金融服务平台（钱袋/美团支付）及财务、数据岗位"
+    "note": "金融服务平台（钱袋/美团支付）及财务、数据岗位",
+    "url": "https://zhaopin.meituan.com"
    }
   ],
   "platforms": [
@@ -4627,33 +4647,225 @@ window.DATA = {
  "guides": [
   {
    "category": "券商",
-   "title": "券商笔试面试攻略",
-   "content": "券商笔试多委托北森、智鼎出题：行测（言语、数字、逻辑、图形推理）限时作答，务必提前在牛客刷对应题库找手感；部分机构加考证券基础知识和金融时事。强烈建议大三考下证券从业资格（证券市场基本法律法规+金融市场基础知识两科），既是笔试助力也是简历加分项。面试方面：研究所常问'估值三件套'——DCF、PE/PB相对估值、EV/EBITDA，要能现场说出对一个行业的跟踪逻辑和2-3只重点覆盖标的的观点；投行岗重财务功底（三张表勾稽关系、尽调流程）、承受强度和项目制意愿。准备一份能讲5分钟的行业深度观点，面试前复盘近期IPO/再融资政策热点，简历上每段实习都要能答出'你具体做了什么、数据从哪来'。"
+   "title": "券商笔试面试全攻略（行测/证券知识/估值面）",
+   "content": "【笔试】券商笔试大多外包给北森、智鼎、ATA：题型为行测（言语理解、数字运算、逻辑推理、图形推理、资料分析），限时作答、题量大，核心是提前刷题库找手感。部分头部券商（中金、中信）加考证券基础知识与金融时事，英文材料阅读也常见。【证书】大三强烈建议考出证券从业资格（一般从业两科：证券市场基本法律法规 + 金融市场基础知识），每年多次考试、两科都是选择题，既是笔试保底也是简历硬通货；投行方向后续可考保荐代表人胜任能力。【面试】研究所（卖方行研）必问「估值三件套」：DCF 绝对估值、PE/PB 相对估值、EV/EBITDA，并能现场讲出一个行业的跟踪逻辑和 2-3 只重点公司的观点——建议提前准备 1-2 个能讲 5 分钟的行业深度观点（如 AI 算力、创新药、新能源车出海）。投行岗重财务功底：三张报表勾稽关系、尽调流程、IPO/再融资最新政策热点。中后台岗（风控/合规/运营）更看重细心程度和 Excel/SQL 能力。【简历】每段实习都要能答出「你具体做了什么、数据从哪来、结论怎么得出」——这是所有券商面试官的第一追问。",
+   "resources": [
+    {
+     "platform": "B站",
+     "title": "搜索：券商校招笔试 行测刷题",
+     "url": "https://search.bilibili.com/all?keyword=券商校招笔试%20行测",
+     "note": "行测真题讲解与限时模考视频"
+    },
+    {
+     "platform": "B站",
+     "title": "搜索：DCF 估值建模教程",
+     "url": "https://search.bilibili.com/all?keyword=DCF估值建模%20教程",
+     "note": "面试前把两阶段 DCF 手搭一遍"
+    },
+    {
+     "platform": "牛客网",
+     "title": "搜索：券商 笔试 面经",
+     "url": "https://www.nowcoder.com/search/all?query=券商%20寒假实习%20面经",
+     "note": "各大券商最新笔试题型与面试真题回忆"
+    },
+    {
+     "platform": "知乎",
+     "title": "搜索：证券从业资格考试 备考攻略",
+     "url": "https://www.zhihu.com/search?type=content&q=证券从业资格考试%20备考攻略%20大三",
+     "note": "两科通关经验，一般 2-4 周可备考完成"
+    },
+    {
+     "platform": "小红书",
+     "title": "搜索：券商实习 面试",
+     "url": "https://www.xiaohongshu.com/search_result?keyword=券商实习面试",
+     "note": "在职学长学姐的一手面试体验帖"
+    }
+   ]
   },
   {
    "category": "公募基金/PE-VC",
-   "title": "公募基金/PE-VC投研岗攻略",
-   "content": "核心是展示'研究能力'而非仅热情。面试常问：一个行业你怎么看、推荐一只股票并给出买入逻辑、估值方法选择（成长股看PEG/DCF、周期股看PB、消费看PE），务必形成自己的分析框架而非背概念。多家公募和PE设有笔试或作业测试：常见形式为限时研报写作（给一个行业或公司，2-3天出一份微型深度报告）、财务建模题（三表联动、DCF搭建），Excel建模和Wind/iFind使用要提前练熟。热点行业（AI算力、创新药、出海、新能源）准备1-2个能深聊的赛道。基金先从产品和持仓研究入手，PE/VC则要准备项目尽调视角和'这门生意的护城河是什么'式追问。实习留用是主通道，大三优先争取公募/研究所日常实习。"
+   "title": "公募基金/PE-VC 投研岗全攻略（研报写作/建模/行业观点）",
+   "content": "【核心认知】投研岗筛人看「研究能力」而非热情：一个完整的分析框架 + 一份拿得出手的模拟研报，比十句「我对投资很有热情」有用。【笔试/作业】常见三种：①限时研报写作——给一个行业或公司，2-3 天交一份微型深度报告（重点练：产业链条拆解、竞争格局、盈利预测、估值结论）；②财务建模题——三表联动、DCF 搭建；③行测+金融专业题。【面试高频题】「你怎么看 XX 行业」「推荐一只股票并给出买入逻辑」「估值方法怎么选」（成长股看 PEG/DCF、周期股看 PB、稳定消费看 PE）「最近市场怎么了」。热点赛道至少准备 1-2 个能深聊的：AI 算力、创新药、出海、低空经济等。PE/VC 还会问尽调视角：「这门生意护城河是什么」「如果让你尽调一家公司你会看哪些科目」。【工具】Excel 建模 + Wind/iFinD 基本操作要熟练，面试可能现场考。【路径现实】公募投研岗大多要求硕士，本科生更现实的是：研究所/私募的日常实习（部门邮箱直投）→ 积累 1-2 段深度实习 → 保研/考研/申研后走校招。量化私募（九坤、明汯等）对数学/编程强的本科生是少数开门的头部买方，但笔面试硬核：概率统计、算法题、市场假设检验。",
+   "resources": [
+    {
+     "platform": "B站",
+     "title": "搜索：财务建模 三张报表",
+     "url": "https://search.bilibili.com/all?keyword=财务建模%20三张报表%20教程",
+     "note": "三表联动建模从零搭建"
+    },
+    {
+     "platform": "B站",
+     "title": "搜索：行研报告 怎么写",
+     "url": "https://search.bilibili.com/all?keyword=行业研究报告%20怎么写",
+     "note": "研报框架与写作套路"
+    },
+    {
+     "platform": "牛客网",
+     "title": "搜索：基金 投研 面经",
+     "url": "https://www.nowcoder.com/search/all?query=基金%20投研%20实习%20面经",
+     "note": "公募/私募面试真题与作业测试回忆"
+    },
+    {
+     "platform": "知乎",
+     "title": "搜索：买方 卖方 区别 职业路径",
+     "url": "https://www.zhihu.com/search?type=content&q=买方%20卖方%20行研%20职业路径",
+     "note": "投研职业路线全景，帮你判断方向"
+    },
+    {
+     "platform": "小红书",
+     "title": "搜索：PE VC 实习 PTA",
+     "url": "https://www.xiaohongshu.com/search_result?keyword=PE%20VC%20实习%20投递",
+     "note": "私募投递邮箱模板与内推经验"
+    }
+   ]
   },
   {
    "category": "银行",
-   "title": "银行笔试面试攻略",
-   "content": "六大行和股份行笔试通常含四大块：EPI（类似行测的言语、数量、逻辑、资料分析，题量大时间紧，正确率优先）、英语（选词填空+阅读，难度约四六级之间，部分行有托业风格题）、综合知识（金融学、经济学、会计、法律、时政热点，考前突击人民银行/金融监管总局最新政策、本行年报口号和战略）、性格测评（SJT情境判断，答出稳定性与抗压性即可，注意前后一致性）。面试以半结构化为主：自我介绍、为什么选银行/我行、对网点工作的理解、团队合作经历；管培生项目会有无领导小组讨论。备考节奏：秋招9月启动，先网申再笔试，牛客有各行历年真题回忆版。寒假实习（如建行、招行寒训营）是大三下转正校招的捷径，提前半年准备。"
+   "title": "银行笔试面试全攻略（EPI/综合知识/半结构化）",
+   "content": "【笔试四大块】①EPI（类似行测：言语、数量、逻辑、资料分析）——题量极大、时间极紧，正确率优先，先易后难；②英语——选词填空+阅读理解，难度在四六级之间；③综合知识——金融学、经济学、会计、法律、时政热点，考前突击人民银行/金融监管总局最新政策、报考银行的年报战略口号（「XX银行的使命愿景」几乎必考）；④性格测评（SJT 情境判断）——答出稳定性与抗压性，注意前后一致性，不要伪装过度。【面试】以半结构化为主：自我介绍（1 分钟版+3 分钟版都备好）、「为什么选银行/为什么选我行」「对柜员/网点工作的理解」「团队合作经历」；管培生项目有无领导小组讨论：抢不做麦霸、推进讨论框架、承担计时/记录角色都能加分。【寒假实习特殊性】银行寒假实习（如招行「梦工场」、建行「建习生」）大多无统一笔试，简历筛选后直接面试——本科可投、竞争温和，是大三学生拿「银行总行/分行实习章」性价比最高的路径，且对次年秋招有明显的绿色通道作用。【证书】银行从业、初级会计你若已有则直接写上；基金从业对理财经理岗加分。",
+   "resources": [
+    {
+     "platform": "B站",
+     "title": "搜索：银行校招 EPI 行测",
+     "url": "https://search.bilibili.com/all?keyword=银行校招%20EPI%20笔试",
+     "note": "六大行/股份行笔试题型精讲"
+    },
+    {
+     "platform": "牛客网",
+     "title": "搜索：银行 寒假实习 面经",
+     "url": "https://www.nowcoder.com/search/all?query=银行%20寒假实习%20面经",
+     "note": "各行寒假实习流程与面试题"
+    },
+    {
+     "platform": "知乎",
+     "title": "搜索：银行 半结构化面试",
+     "url": "https://www.zhihu.com/search?type=content&q=银行%20半结构化面试%20真题",
+     "note": "高频问题与回答框架"
+    },
+    {
+     "platform": "小红书",
+     "title": "搜索：银行实习 梦工场 建习生",
+     "url": "https://www.xiaohongshu.com/search_result?keyword=银行寒假实习",
+     "note": "招行梦工场/建行建习生一手体验"
+    }
+   ]
   },
   {
    "category": "四大",
-   "title": "四大OT与群面攻略",
-   "content": "四大在线测评各不相同：PwC用游戏化测评（Pymetrics类，二选一/气球/面部识别小游戏，考风险偏好和认知，无法突击但网上一刷有经验帖）；KPMG/德勤/EY多用cut-e题库（数字推理、图形切换、逻辑表格，核心是限时6分钟内做更多题，必须提前在牛客找同款题库模拟）。英语是隐性门槛：网申CV需英文、经理面可能穿插英文自我介绍和随机英文问答，提前把简历每个点写成英文版并朗读流利。群面（AC面）以英文材料商业case为主：抢不做麦霸、推进讨论框架、承担计时/记录角色均可加分，杜绝抢话和沉默。寒假实习（Winter Internship）和暑期实习是四大校招主通道，大三上9-10月即可投次年寒假审计实习，忙季实习留用率高，审计岗对专业不限。"
+   "title": "四大 OT 测评与群面全攻略（GBA/cut-e/AC面）",
+   "content": "【在线测评 OT】四家不同：普华永道用游戏化测评（GBA/Pymetrics 类：气球充气、密码配对等小游戏，测风险偏好与认知，无法突击，但网上有经验帖教你保持策略一致性）；毕马威/德勤/安永多用 cut-e 或 SHL 题库：数字推理、图形切换、逻辑表格，核心是限时内做对更多题——必须提前在牛客找同款题库模拟 2-3 轮。【英语】隐性门槛：网申要填英文简历、OT 含英文题、经理面可能随机切换英文问答——把简历每个 bullet 写成英文版并练到能流利说出来。【群面/AC 面】英文商业 case 为主：审题 5 分钟→自由讨论 20-30 分钟→总结陈述。加分行为：推进讨论框架（「我们是不是先明确目标客群」）、承担计时员/记录员、在僵局时总结分歧；扣分行为：抢话麦霸、全程沉默、人身攻击。【时间线（对大三最关键）】四大寒假实习（Winter Internship）一般 8-9 月随秋招开放网申、10 月滚动截止，寒假 1-2 月正好是审计年审忙季——忙季实习留用率显著高于平时；寒假实习表现好可拿暑期实习直通或早期全职 offer（毕马威 2027 批次明确面向 2028 届优先）。审计岗不限专业、本科可投，是你这个背景确定性最高的头部机构入口。",
+   "resources": [
+    {
+     "platform": "B站",
+     "title": "搜索：四大 网申 测评 GBA",
+     "url": "https://search.bilibili.com/all?keyword=四大%20网申测评%20GBA",
+     "note": "游戏化测评实机演示与策略"
+    },
+    {
+     "platform": "B站",
+     "title": "搜索：cut-e 题型 練習",
+     "url": "https://search.bilibili.com/all?keyword=cut-e%20题库%20练习",
+     "note": "KPMG/德勤/EY 同款题型限时训练"
+    },
+    {
+     "platform": "牛客网",
+     "title": "搜索：四大 寒假实习 面经",
+     "url": "https://www.nowcoder.com/search/all?query=四大%20寒假实习%20面经",
+     "note": "四家最新 OT 形式与面试真题"
+    },
+    {
+     "platform": "知乎",
+     "title": "搜索：四大 群面 AC面 技巧",
+     "url": "https://www.zhihu.com/search?type=content&q=四大%20群面%20AC面%20技巧",
+     "note": "角色分工与加分行为清单"
+    },
+    {
+     "platform": "小红书",
+     "title": "搜索：四大寒假实习",
+     "url": "https://www.xiaohongshu.com/search_result?keyword=四大寒假实习",
+     "note": "忙季实习日常与留用真实分享"
+    }
+   ]
   },
   {
    "category": "咨询PTA",
-   "title": "咨询PTA与Case面试攻略",
-   "content": "PTA（兼职助理）是本科生进咨询的现实路径，招聘偏轻：远程PTA常年散招，靠学长学姐或项目组直接拉人，简历重点写数据处理、PPT和访谈支持经历。面试核心是Case Interview：掌握Profitability（利润=收入-成本拆解）、Market Entry（市场进入三步：市场吸引力-自身能力-进入方式）、Market Sizing（费米估算，练习'上海一年咖啡消费量'类题）三大基础框架，找人mock对话式作答而非背框架，MECE和先给结论是评分关键。入职后技能：访谈纪要（录音转写+提炼要点）、专家访谈排期、桌面研究（行业数据交叉验证）、干净美观的PPT页面（学习麦肯锡式图表语言）。BCG、麦肯锡、罗兰贝格均设寒暑期实习项目，Growth/探元素等夏令营每年春招开放，尽早投递。"
+   "title": "咨询 PTA 与 Case Interview 全攻略",
+   "content": "【路径认知】PTA（兼职助理）是本科生进咨询的现实路径：远程 PTA 常年散招，靠学长学姐或项目组直接拉人，入职门槛比正式实习低得多。简历重点写：数据处理（Excel/SQL）、PPT 制作、访谈支持、桌面研究——正是 PTA 的日常工作。【Case Interview 三大基础框架】①Profitability：利润 = 收入 - 成本，逐层拆解量价、产品线、渠道；②Market Entry：市场吸引力 → 自身能力匹配 → 进入方式；③Market Sizing：费米估算，练习「上海一年咖啡消费量」「杭州网约车日单量」类题。关键是找人 mock 对话式作答而不是背框架，评分看 MECE 和「先给结论」。【入职后技能】访谈纪要（录音转写+提炼要点）、专家访谈排期、桌面研究（行业数据交叉验证）、干净美观的 PPT 页面（学麦肯锡式图表语言：一页一结论）。【投递】MBB 官方 PTA 走官方公众号和校园 BBS；罗兰贝格、科尔尼、奥纬、L.E.K. 官网 Careers 常年挂岗；注意甄别「付费 PTA」——麦肯锡官方明确不收费，凡收钱内推均为骗局。",
+   "resources": [
+    {
+     "platform": "B站",
+     "title": "搜索：case interview 框架",
+     "url": "https://search.bilibili.com/all?keyword=case%20interview%20框架%20咨询",
+     "note": "三大框架讲解与真题 mock"
+    },
+    {
+     "platform": "B站",
+     "title": "搜索：咨询 PTA 日常",
+     "url": "https://search.bilibili.com/all?keyword=咨询%20PTA%20日常",
+     "note": "PTA 工作内容实拍，判断是否适合你"
+    },
+    {
+     "platform": "知乎",
+     "title": "搜索：咨询 PTA 怎么申请",
+     "url": "https://www.zhihu.com/search?type=content&q=咨询%20PTA%20怎么申请%20本科生",
+     "note": "本科生申请路径与邮箱模板"
+    },
+    {
+     "platform": "小红书",
+     "title": "搜索：PTA 招聘 邮箱",
+     "url": "https://www.xiaohongshu.com/search_result?keyword=咨询PTA%20招聘",
+     "note": "在招 PTA 岗位信息聚合帖"
+    },
+    {
+     "platform": "网站",
+     "title": "牛客咨询专区",
+     "url": "https://www.nowcoder.com/search/all?query=咨询%20PTA%20面经",
+     "note": "case 面真题与 PTA 面经"
+    }
+   ]
   },
   {
    "category": "大厂金融数据岗",
-   "title": "互联网大厂金融/数据岗攻略",
-   "content": "笔试：大厂通用行测（数字规律、逻辑推理、资料分析）+岗位加试；数据岗常考SQL上机（窗口函数、多表join，LeetCode简单-中等难度+牛客SQL题库刷够100题）、Python（pandas处理数据的实操题）和基础统计（假设检验、A/B测试原理）。面试分三轮：业务面、总监面、HR面。业务面必考业务Case：'某支付产品GMV下降10%怎么分析'（先拆维度：用户量×客单价×频次，再区分内外部因素）、'如何设计一个指标衡量XX功能'；金融岗加问支付/信贷/理财业务理解，提前研究支付宝、微信支付、美团金融的产品逻辑。简历上实习要量化结果（DAU、转化率、GMV贡献）。日常实习全年可投，大四前累计两段大厂数据/金融实习是通过校招筛选的最稳路径。"
+   "title": "互联网大厂金融/数据岗全攻略（SQL/业务Case/三轮面）",
+   "content": "【笔试】大厂通用行测（数字规律、逻辑推理、资料分析）+ 岗位加试：数据岗常考 SQL 上机（窗口函数、多表 join，LeetCode 简单-中等难度 + 牛客 SQL 题库刷够 100 题）、Python pandas 实操、基础统计（假设检验、A/B 测试原理）。【面试三轮】业务面→总监面/交叉面→HR 面。业务面必考业务 Case：「某支付产品 GMV 下降 10% 怎么分析」（先拆维度：用户量×客单价×频次，再区分内外部因素）「如何设计指标衡量 XX 功能」；金融岗加问支付/信贷/理财业务理解——提前研究支付宝、微信支付、美团金融的产品逻辑和变现模式。【简历】实习经历必须量化结果（DAU、转化率、GMV 贡献、效率提升百分比），「用 SQL 清洗 50 万条数据把日报从 2 小时压缩到 15 分钟」这类写法就是标准答案。【路径】大厂日常实习全年可投、本科可投、流程快（字节尤其），是你最应该「随时投、广泛投」的类别；杭州的蚂蚁、同花顺、恒生电子对本地学生极度友好。大四前累计两段大厂数据/金融实习，是通过校招筛选的最稳路径。",
+   "resources": [
+    {
+     "platform": "网站",
+     "title": "牛客 SQL 必知必会题库",
+     "url": "https://www.nowcoder.com/ta/sql",
+     "note": "数据岗笔试 SQL 刷题主战场"
+    },
+    {
+     "platform": "网站",
+     "title": "力扣中国",
+     "url": "https://leetcode.cn/problemset/",
+     "note": "按「简单+中等」刷，重点数组和字符串"
+    },
+    {
+     "platform": "B站",
+     "title": "搜索：数据分析 面试 业务case",
+     "url": "https://search.bilibili.com/all?keyword=数据分析面试%20业务case",
+     "note": "GMV下降怎么分析类题的标准拆法"
+    },
+    {
+     "platform": "B站",
+     "title": "搜索：A/B测试 原理",
+     "url": "https://search.bilibili.com/all?keyword=AB测试%20原理%20面试",
+     "note": "统计基础 30 分钟速成"
+    },
+    {
+     "platform": "牛客网",
+     "title": "搜索：大厂 数据分析 面经",
+     "url": "https://www.nowcoder.com/search/all?query=数据分析%20实习%20面经",
+     "note": "蚂蚁/字节/腾讯最新面经"
+    },
+    {
+     "platform": "小红书",
+     "title": "搜索：大厂日常实习 内推",
+     "url": "https://www.xiaohongshu.com/search_result?keyword=大厂日常实习%20内推",
+     "note": "在招岗位与内推码信息流"
+    }
+   ]
   }
  ]
 };

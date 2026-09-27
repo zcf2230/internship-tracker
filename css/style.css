@@ -202,6 +202,24 @@ button { font-family: inherit; cursor: pointer; }
 .guide-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 20px; margin-bottom: 14px; }
 .guide-card h3 { font-size: 16px; color: var(--blue); margin-bottom: 8px; }
 .guide-card p { font-size: 14px; color: var(--ink-2); white-space: pre-wrap; }
+.res-title { font-size: 14px; color: var(--blue); margin: 12px 0 6px; }
+.res-list { list-style: none; }
+.res-list li { padding: 6px 0; border-bottom: 1px dashed var(--line); font-size: 13.5px; }
+.res-list li:last-child { border-bottom: none; }
+.res-platform {
+  display: inline-block; font-size: 11.5px; padding: 1px 8px; border-radius: 999px;
+  background: var(--blue-soft); color: var(--blue); margin-right: 6px; vertical-align: 1px;
+}
+.res-note { color: var(--ink-3); font-size: 12.5px; margin-left: 8px; }
+
+/* 返回顶部 */
+#backTop {
+  position: fixed; right: 22px; bottom: 26px; width: 42px; height: 42px;
+  border-radius: 50%; border: none; background: var(--blue); color: #fff;
+  font-size: 18px; box-shadow: var(--shadow); opacity: 0; pointer-events: none;
+  transition: opacity .2s; z-index: 40;
+}
+#backTop.show { opacity: .92; pointer-events: auto; }
 
 /* ---------- misc ---------- */
 .empty-state { text-align: center; color: var(--ink-3); padding: 60px 0; font-size: 15px; }
