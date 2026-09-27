@@ -6298,8 +6298,8 @@ window.DATA = {
    "salary": "",
    "housing": "",
    "retention": "",
-   "applyLink": "https://zhaopin.mihoyo.com",
-   "referral": "公众号「米哈游招聘」；牛客网米哈游内推（内推码活动）",
+   "applyLink": "https://www.mihoyo.com",
+   "referral": "官网 www.mihoyo.com →「招聘」入口（米哈游招聘专项）；公众号「米哈游招聘」；牛客网米哈游内推",
    "source": "米哈游实习生专项官方信息：面向2028届及以后在校生、八大实习通道、全年开放；牛客内推帖：财务类含核算/税务/资金/财务BP",
    "confidence": "中"
   },
