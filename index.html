@@ -6,7 +6,7 @@
 <title>金融实习网申通 · 2027 寒假实习</title>
 <meta name="description" content="各大券商、基金、银行、四大、咨询、大厂实习生招聘网申时间、用人要求、笔试提醒一站式查询">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
-<link rel="stylesheet" href="css/style.css?v=5">
+<link rel="stylesheet" href="css/style.css?v=6">
 </head>
 <body>
 
@@ -126,6 +126,20 @@
   </div>
 </footer>
 
+<!-- 登录门（数据加密） -->
+<div id="loginGate" class="login-gate" hidden>
+  <div class="login-card">
+    <div class="login-logo">📈</div>
+    <h2>金融实习网申通</h2>
+    <p class="login-sub">数据已加密保护，请登录查看</p>
+    <input id="loginUser" placeholder="账号" autocomplete="username">
+    <input id="loginPass" type="password" placeholder="密码" autocomplete="current-password">
+    <button id="loginBtn">解锁并进入</button>
+    <p id="loginErr" class="login-err"></p>
+    <p class="login-hint">全站数据经 AES-256-GCM 加密，密钥仅在你的设备上由账号密码派生，不会上传</p>
+  </div>
+</div>
+
 <!-- 返回顶部 -->
 <button id="backTop" title="返回顶部">↑</button>
 
@@ -135,7 +149,7 @@
   <div class="modal-body" id="modalBody"></div>
 </div>
 
-<script src="js/data.js?v=3"></script>
-<script src="js/app.js?v=5"></script>
+<script src="js/data.enc.js?v=1"></script>
+<script src="js/app.js?v=6"></script>
 </body>
 </html>

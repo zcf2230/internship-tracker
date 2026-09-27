@@ -544,5 +544,80 @@
       reader.readAsText(file);
     };
   }
-  document.addEventListener("DOMContentLoaded", init);
+  document.addEventListener("DOMContentLoaded", boot);
+
+  /* ---------- 登录门：解密加密数据 ---------- */
+  var KEY_CACHE = "itr_session_key";
+  function b64ToBuf(b64) {
+    var bin = atob(b64), arr = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    return arr;
+  }
+  function bufToB64(buf) {
+    var arr = new Uint8Array(buf), bin = "";
+    for (var i = 0; i < arr.length; i++) bin += String.fromCharCode(arr[i]);
+    return btoa(bin);
+  }
+  function deriveKey(user, pass, saltBuf) {
+    return crypto.subtle.importKey("raw", new TextEncoder().encode(user + ":" + pass), "PBKDF2", false, ["deriveKey"])
+      .then(function (base) {
+        return crypto.subtle.deriveKey(
+          { name: "PBKDF2", salt: saltBuf, iterations: 150000, hash: "SHA-256" },
+          base, { name: "AES-GCM", length: 256 }, true, ["decrypt"]);
+      });
+  }
+  function decryptData(key) {
+    var enc = window.ENC_DATA;
+    var ct = b64ToBuf(enc.ct);
+    return crypto.subtle.decrypt({ name: "AES-GCM", iv: b64ToBuf(enc.iv) }, key, ct)
+      .then(function (plain) {
+        window.DATA = JSON.parse(new TextDecoder().decode(plain));
+        return true;
+      });
+  }
+  function showLogin(msg) {
+    var gate = $("#loginGate");
+    gate.hidden = false;
+    $("#loginErr").textContent = msg || "";
+  }
+  function hideLogin() { $("#loginGate").hidden = true; }
+  function afterUnlock() {
+    hideLogin();
+    init();
+  }
+  function boot() {
+    if (!window.ENC_DATA) { init(); return; } // 兼容无加密数据的情况
+    // 会话内已解锁：静默解密
+    var cached = sessionStorage.getItem(KEY_CACHE);
+    if (cached) {
+      crypto.subtle.importKey("jwk", JSON.parse(cached), { name: "AES-GCM" }, true, ["decrypt"])
+        .then(decryptData)
+        .then(afterUnlock)
+        .catch(function () { sessionStorage.removeItem(KEY_CACHE); showLogin(); });
+      return;
+    }
+    showLogin();
+    function attempt() {
+      var u = $("#loginUser").value.trim(), p = $("#loginPass").value;
+      if (!u || !p) { $("#loginErr").textContent = "请输入账号和密码"; return; }
+      var btn = $("#loginBtn");
+      btn.textContent = "解密中…"; btn.disabled = true;
+      deriveKey(u, p, b64ToBuf(window.ENC_DATA.salt))
+        .then(function (key) {
+          return decryptData(key).then(function () {
+            return crypto.subtle.exportKey("jwk", key).then(function (jwk) {
+              sessionStorage.setItem(KEY_CACHE, JSON.stringify(jwk));
+            });
+          });
+        })
+        .then(afterUnlock)
+        .catch(function () {
+          btn.textContent = "解锁并进入"; btn.disabled = false;
+          $("#loginErr").textContent = "账号或密码错误（或数据损坏）";
+        });
+    }
+    $("#loginBtn").onclick = attempt;
+    $("#loginPass").onkeydown = function (e) { if (e.key === "Enter") attempt(); };
+    $("#loginUser").onkeydown = function (e) { if (e.key === "Enter") $("#loginPass").focus(); };
+  }
 })();

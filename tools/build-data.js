@@ -7,7 +7,7 @@ const fs = require("fs");
 const path = require("path");
 
 const RAW = path.join(__dirname, "raw");
-const OUT = path.join(__dirname, "..", "js", "data.js");
+const OUT = path.join(__dirname, "data.json");
 
 const CAT_MAP = {
   "大厂": "大厂/金融科技",
@@ -75,6 +75,6 @@ const guidesFile = path.join(RAW, "guides.json");
 if (fs.existsSync(guidesFile)) guides = JSON.parse(fs.readFileSync(guidesFile, "utf8"));
 
 const data = { updatedAt: "2026-09-26", companies, channels, guides };
-const js = "/* 本文件由 tools/build-data.js 生成，编辑请改 tools/raw/ 下源文件后重新生成 */\nwindow.DATA = " + JSON.stringify(data, null, 1) + ";\n";
+const js = JSON.stringify(data, null, 1);
 fs.writeFileSync(OUT, js, "utf8");
 console.log(`OK: ${companies.length} 家公司，${guides.length} 篇攻略，渠道 ${(channels.official || []).length + (channels.platforms || []).length + (channels.referral || []).length} 条 -> ${OUT}`);
