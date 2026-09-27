@@ -572,6 +572,7 @@
     return crypto.subtle.decrypt({ name: "AES-GCM", iv: b64ToBuf(enc.iv) }, key, ct)
       .then(function (plain) {
         window.DATA = JSON.parse(new TextDecoder().decode(plain));
+        DATA = window.DATA; // 同步闭包变量（加载时指向空对象）
         return true;
       });
   }
@@ -604,15 +605,15 @@
       btn.textContent = "解密中…"; btn.disabled = true;
       deriveKey(u, p, b64ToBuf(window.ENC_DATA.salt))
         .then(function (key) {
-          return decryptData(key).then(function () {
-            return crypto.subtle.exportKey("jwk", key).then(function (jwk) {
+              return decryptData(key).then(function () {
+                  return crypto.subtle.exportKey("jwk", key).then(function (jwk) {
               sessionStorage.setItem(KEY_CACHE, JSON.stringify(jwk));
-            });
+                    });
           });
         })
         .then(afterUnlock)
-        .catch(function () {
-          btn.textContent = "解锁并进入"; btn.disabled = false;
+        .catch(function (e) {
+              btn.textContent = "解锁并进入"; btn.disabled = false;
           $("#loginErr").textContent = "账号或密码错误（或数据损坏）";
         });
     }
