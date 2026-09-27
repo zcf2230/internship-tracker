@@ -90,6 +90,14 @@ button { font-family: inherit; cursor: pointer; }
   padding: 7px 14px; font-size: 13.5px; color: var(--ink-2);
 }
 .btn-ghost:hover { border-color: var(--blue); color: var(--blue); }
+.btn-star {
+  border: none; background: none; font-size: 17px; color: #c9d4de;
+  padding: 4px 6px; cursor: pointer; line-height: 1;
+}
+.btn-star.on { color: #f0a500; }
+.btn-star:hover { transform: scale(1.15); }
+.backup-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.backup-hint { font-size: 12.5px; color: var(--ink-3); }
 .result-count { font-size: 13px; color: var(--ink-3); margin-top: 8px; }
 
 /* ---------- company cards ---------- */

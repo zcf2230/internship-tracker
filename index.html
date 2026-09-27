@@ -6,7 +6,7 @@
 <title>金融实习网申通 · 2027 寒假实习</title>
 <meta name="description" content="各大券商、基金、银行、四大、咨询、大厂实习生招聘网申时间、用人要求、笔试提醒一站式查询">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
-<link rel="stylesheet" href="css/style.css?v=4">
+<link rel="stylesheet" href="css/style.css?v=5">
 </head>
 <body>
 
@@ -66,6 +66,7 @@
         </select>
         <select id="statusFilter">
           <option value="">进度不限</option>
+          <option value="fav">★ 已收藏</option>
           <option value="none">未投递</option>
           <option value="applied">网申中</option>
           <option value="written">已笔试</option>
@@ -97,6 +98,12 @@
 <main id="tab-progress" class="tab-pane">
   <div class="container">
     <div class="progress-stats" id="progressStats"></div>
+    <div class="backup-bar">
+      <button id="exportProgress" class="btn-ghost">⬇️ 导出进度备份</button>
+      <button id="importProgress" class="btn-ghost">⬆️ 导入恢复</button>
+      <input type="file" id="importFile" accept=".json,application/json" hidden>
+      <span class="backup-hint">换电脑/清缓存前先导出，导入后自动恢复全部进度和收藏</span>
+    </div>
     <div class="kanban" id="kanban"></div>
     <p class="hint">进度保存在你本机的浏览器里（localStorage），只有你自己看得到。</p>
   </div>
@@ -129,6 +136,6 @@
 </div>
 
 <script src="js/data.js?v=3"></script>
-<script src="js/app.js?v=4"></script>
+<script src="js/app.js?v=5"></script>
 </body>
 </html>

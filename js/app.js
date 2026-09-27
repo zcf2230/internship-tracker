@@ -4,6 +4,13 @@
 
   var DATA = window.DATA || { updatedAt: "", companies: [], channels: {}, guides: [] };
   var LS_KEY = "internship_progress_v1";
+  var FAV_KEY = "internship_favorites_v1";
+  function loadFavorites() {
+    try { return JSON.parse(localStorage.getItem(FAV_KEY)) || {}; } catch (e) { return {}; }
+  }
+  var favorites = loadFavorites();
+  function saveFavorites() { localStorage.setItem(FAV_KEY, JSON.stringify(favorites)); }
+  function isFav(id) { return !!favorites[id]; }
   var STAGES = [
     { key: "none", label: "未投递" },
     { key: "applied", label: "网申中" },
@@ -141,13 +148,18 @@
     if (filters.test === "no" && hasTest(c) !== false) return false;
     if (filters.hz === "hz" && (c.cities || []).indexOf("杭州") < 0) return false;
     if (filters.status) {
-      var pg = progress[c.id] ? progress[c.id].stage : "none";
-      if (filters.status === "none" && pg !== "none") return false;
-      if (filters.status !== "none" && pg !== filters.status) return false;
+      if (filters.status === "fav") { if (!isFav(c.id)) return false; }
+      else {
+        var pg = progress[c.id] ? progress[c.id].stage : "none";
+        if (filters.status === "none" && pg !== "none") return false;
+        if (filters.status !== "none" && pg !== filters.status) return false;
+      }
     }
     return true;
   }
   function sortCompanies(a, b) {
+    var fa = isFav(a.id), fb = isFav(b.id);
+    if (fa !== fb) return fa ? -1 : 1; // 收藏的永远置顶
     var oa = companyStatus(a), ob = companyStatus(b);
     var order = { opening: 0, rolling: 1, soon: 2, unknown: 3, closed: 4 };
     if (order[oa.state] !== order[ob.state]) return order[oa.state] - order[ob.state];
@@ -214,6 +226,7 @@
         '<div class="card-batches">' + (c.batches || []).map(batchLine).join("") + "</div>" +
         '<div class="card-meta">' + meta.join("") + "</div>" +
         '<div class="card-actions">' +
+          '<button class="btn-star' + (isFav(c.id) ? " on" : "") + '" data-fav="' + esc(c.id) + '" title="' + (isFav(c.id) ? "取消收藏" : "收藏置顶") + '">★</button>' +
           '<button class="btn" data-detail="' + esc(c.id) + '">详情 / 要求</button>' +
           (c.applyLink ? '<a class="btn apply" href="' + esc(c.applyLink) + '" target="_blank" rel="noopener">官网网申 ↗</a>' : "") +
           '<a class="btn secondary" href="https://www.bing.com/search?q=' + encodeURIComponent(c.name + " 实习生招聘 官方网申") + '" target="_blank" rel="noopener" title="打不开官网链接时，用必应搜该公司官方招聘入口">🔍 搜官方入口</a>' +
@@ -442,6 +455,14 @@
       renderList();
     };
     $("#companyList").onclick = function (e) {
+      var f = e.target.closest("[data-fav]");
+      if (f) {
+        var fid = f.dataset.fav;
+        if (favorites[fid]) delete favorites[fid]; else favorites[fid] = 1;
+        saveFavorites();
+        renderList();
+        return;
+      }
       var b = e.target.closest("[data-detail]");
       if (b) return openDetail(b.dataset.detail);
       var p = e.target.closest(".progress-mini button");
@@ -484,6 +505,44 @@
       backTop.classList.toggle("show", window.scrollY > 600);
     }, { passive: true });
     backTop.onclick = function () { window.scrollTo({ top: 0, behavior: "smooth" }); };
+    // 进度备份：导出/导入
+    $("#exportProgress").onclick = function () {
+      var payload = { app: "internship-tracker", exportedAt: new Date().toISOString(), progress: progress, favorites: favorites };
+      var blob = new Blob([JSON.stringify(payload, null, 1)], { type: "application/json" });
+      var a = document.createElement("a");
+      var d = new Date();
+      a.href = URL.createObjectURL(blob);
+      a.download = "实习投递进度-" + d.getFullYear() + (d.getMonth() + 1) + d.getDate() + ".json";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(function () { URL.revokeObjectURL(a.href); }, 3000);
+    };
+    $("#importProgress").onclick = function () { $("#importFile").click(); };
+    $("#importFile").onchange = function () {
+      var file = this.files[0];
+      this.value = "";
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function () {
+        try {
+          var data = JSON.parse(reader.result);
+          if (!data || typeof data !== "object" || !data.progress) throw new Error("格式不对");
+          var np = data.progress || {}, nf = data.favorites || {};
+          var pCount = 0, fCount = 0;
+          Object.keys(np).forEach(function (k) { progress[k] = np[k]; pCount++; });
+          Object.keys(nf).forEach(function (k) { favorites[k] = 1; fCount++; });
+          saveProgress(progress);
+          saveFavorites();
+          renderList();
+          renderProgress();
+          alert("恢复完成：导入 " + pCount + " 条投递进度、" + fCount + " 个收藏。");
+        } catch (err) {
+          alert("导入失败：" + err.message + "。请确认选择的是本站导出的备份文件。");
+        }
+      };
+      reader.readAsText(file);
+    };
   }
   document.addEventListener("DOMContentLoaded", init);
 })();
