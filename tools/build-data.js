@@ -22,6 +22,8 @@ const CAT_MAP = {
   "信托": "银行/保险/信托",
   "金融租赁": "银行/保险/信托",
   "消费金融": "银行/保险/信托",
+  "央国企": "央国企",
+  "杭州科技公司": "大厂/金融科技",
   "实体企业": "上市公司",
   "四大/咨询": "四大/咨询"
 };
@@ -58,7 +60,7 @@ function companiesFrom(file) {
   });
 }
 
-const files = ["brokers.json", "funds.json", "banks.json", "big4.json", "dachang.json", "region.json", "brokers2.json", "buyout.json"];
+const files = ["brokers.json", "funds.json", "banks.json", "big4.json", "dachang.json", "region.json", "brokers2.json", "buyout.json", "tech.json", "soe.json"];
 let companies = [];
 for (const f of files) companies = companies.concat(companiesFrom(f));
 
