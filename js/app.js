@@ -581,7 +581,7 @@
     gate.hidden = false;
     $("#loginErr").textContent = msg || "";
   }
-  function hideLogin() { $("#loginGate").hidden = true; }
+  function hideLogin() { $("#loginGate").hidden = true; $("#loginErr").textContent = ""; }
   function afterUnlock() {
     hideLogin();
     init();
