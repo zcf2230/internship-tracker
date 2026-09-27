@@ -58,7 +58,7 @@ function companiesFrom(file) {
   });
 }
 
-const files = ["brokers.json", "funds.json", "banks.json", "big4.json", "dachang.json", "region.json", "buyout.json"];
+const files = ["brokers.json", "funds.json", "banks.json", "big4.json", "dachang.json", "region.json", "brokers2.json", "buyout.json"];
 let companies = [];
 for (const f of files) companies = companies.concat(companiesFrom(f));
 
