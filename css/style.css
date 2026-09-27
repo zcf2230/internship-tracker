@@ -239,6 +239,7 @@ button { font-family: inherit; cursor: pointer; }
   background: linear-gradient(135deg, #0e2440 0%, #14304f 50%, #1a5fb4 100%);
   display: flex; align-items: center; justify-content: center; padding: 20px;
 }
+.login-gate[hidden] { display: none; }
 .login-card {
   background: #fff; border-radius: 18px; padding: 34px 34px 26px;
   width: 100%; max-width: 380px; box-shadow: 0 24px 70px rgba(0,0,0,.4); text-align: center;
