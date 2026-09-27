@@ -293,6 +293,7 @@
   }
 
   /* ---------- 渲染：投递进度 ---------- */
+  var kanbanCat = {}; // 每列的公司类型筛选
   function renderProgress() {
     var stats = { none: 0, applied: 0, written: 0, interview: 0, offer: 0, drop: 0 };
     DATA.companies.forEach(function (c) {
@@ -304,17 +305,62 @@
       '<div class="stat-box"><b>' + stats.written + "</b><span>已笔试</span></div>" +
       '<div class="stat-box"><b>' + stats.interview + "</b><span>已面试</span></div>" +
       '<div class="stat-box"><b>' + stats.offer + "</b><span>已Offer</span></div>";
+    var cats = [];
+    DATA.companies.forEach(function (c) { if (cats.indexOf(c.category) < 0) cats.push(c.category); });
     $("#kanban").innerHTML = STAGES.map(function (s) {
+      var cat = kanbanCat[s.key] || "";
       var items = DATA.companies.filter(function (c) {
-        return (progress[c.id] ? progress[c.id].stage : "none") === s.key;
+        if ((progress[c.id] ? progress[c.id].stage : "none") !== s.key) return false;
+        if (cat && c.category !== cat) return false;
+        return true;
       });
-      return '<div class="kanban-col"><h4>' + s.label + "（" + items.length + "）</h4>" +
+      var opts = '<option value="">全部类型</option>' + cats.map(function (x) {
+        return '<option value="' + esc(x) + '"' + (cat === x ? " selected" : "") + ">" + esc(x) + "</option>";
+      }).join("");
+      return '<div class="kanban-col" data-stage="' + s.key + '"><div class="kanban-head"><h4>' + s.label + "（" + items.length + "）</h4>" +
+        '<select class="kanban-cat" data-stage="' + s.key + '">' + opts + "</select></div>" +
         (items.length ? items.map(function (c) {
           var st = companyStatus(c);
-          return '<div class="kanban-item" data-detail="' + esc(c.id) + '">' + esc(c.name) +
+          return '<div class="kanban-item" draggable="true" data-drag="' + esc(c.id) + '" data-detail="' + esc(c.id) + '">' + esc(c.name) +
             "<small>" + esc(c.category) + " · " + statusLabel(st) + "</small></div>";
-        }).join("") : '<div class="kanban-empty">—</div>') + "</div>";
+        }).join("") : '<div class="kanban-empty">拖拽卡片到这里</div>') + "</div>";
     }).join("");
+    bindKanban();
+  }
+  function bindKanban() {
+    // 每列类型筛选
+    $$(".kanban-cat").forEach(function (sel) {
+      sel.onchange = function () {
+        kanbanCat[sel.dataset.stage] = sel.value;
+        try { localStorage.setItem(LS_KEY + "_kanbanCat", JSON.stringify(kanbanCat)); } catch (e) {}
+        renderProgress();
+      };
+      sel.onclick = function (e) { e.stopPropagation(); };
+    });
+    // 拖拽：从一列拖到另一列即改变阶段
+    var dragId = null;
+    $$(".kanban-item").forEach(function (it) {
+      it.addEventListener("dragstart", function () { dragId = it.dataset.drag; it.classList.add("dragging"); });
+      it.addEventListener("dragend", function () { it.classList.remove("dragging"); });
+      it.addEventListener("click", function () { openDetail(it.dataset.detail); });
+    });
+    $$(".kanban-col").forEach(function (col) {
+      col.addEventListener("dragover", function (e) { e.preventDefault(); col.classList.add("drag-over"); });
+      col.addEventListener("dragleave", function () { col.classList.remove("drag-over"); });
+      col.addEventListener("drop", function (e) {
+        e.preventDefault();
+        col.classList.remove("drag-over");
+        if (!dragId) return;
+        var stage = col.dataset.stage;
+        if (progress[dragId] && progress[dragId].stage === stage) { dragId = null; return; }
+        progress[dragId] = { stage: stage, updated: new Date().toISOString() };
+        if (stage === "none") delete progress[dragId];
+        saveProgress(progress);
+        dragId = null;
+        renderProgress();
+        renderList();
+      });
+    });
   }
 
   /* ---------- 渲染：渠道与攻略 ---------- */
@@ -415,10 +461,6 @@
       var b = e.target.closest("[data-goto]");
       if (b) openDetail(b.dataset.goto);
     };
-    $("#kanban").onclick = function (e) {
-      var b = e.target.closest("[data-detail]");
-      if (b) openDetail(b.dataset.detail);
-    };
   }
 
   /* ---------- 启动 ---------- */
@@ -428,6 +470,7 @@
     $("#updatedAt").textContent = DATA.updatedAt || "整理中";
     // 数据行补 id
     DATA.companies.forEach(function (c, i) { if (!c.id) c.id = "c" + i; });
+    try { kanbanCat = JSON.parse(localStorage.getItem(LS_KEY + "_kanbanCat")) || {}; } catch (e) { kanbanCat = {}; }
     renderCategories();
     renderAlert();
     renderList();

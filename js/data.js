@@ -178,7 +178,7 @@ window.DATA = {
    "salary": "约150-300元/天",
    "housing": "不包住宿，部分有餐补",
    "retention": "实习表现优秀可转正/校招优先",
-   "applyLink": "https://campus.htsc.com.cn",
+   "applyLink": "https://job.htsc.com.cn",
    "referral": "华泰证券招聘（微信公众号）",
    "source": "华泰证券2027届校招启动公告（东华大学就业网2026-04）及官网招聘频道，寒假批无直接公告",
    "confidence": "中"
@@ -225,7 +225,7 @@ window.DATA = {
    "salary": "约100-300元/天",
    "housing": "不包住宿，部分有餐补",
    "retention": "优秀寒假实习生可直推暑期并争取留用",
-   "applyLink": "https://campus.gtht.com",
+   "applyLink": "https://www.gtht.com",
    "referral": "国泰海通招聘（微信公众号；校招系统 campus.gtht.com，原 gtjas.com 域名已停用）",
    "source": "国泰海通湖南分公司2027届校招简章（北京联合大学就业网2026-09）、总部2027届校招公告及校友寒假实习留用经验",
    "confidence": "低"
@@ -271,7 +271,7 @@ window.DATA = {
    "salary": "约100-300元/天",
    "housing": "不包住宿，部分有餐补",
    "retention": "实习表现优秀可留用/校招优先",
-   "applyLink": "https://careers.newone.com.cn",
+   "applyLink": "https://www.newone.com.cn",
    "referral": "招商证券招聘（微信公众号）",
    "source": "牛客网校招流程帖及官网招聘频道；寒假批未搜到直接公告，时间为券商一般规律",
    "confidence": "低"
@@ -364,7 +364,7 @@ window.DATA = {
    "salary": "约100-200元/天",
    "housing": "不包住宿，部分有餐补",
    "retention": "暑期实习优秀者可留用",
-   "applyLink": "https://campus.xyzq.cn",
+   "applyLink": "https://www.xyzq.com.cn",
    "referral": "兴业证券招聘（微信公众号）",
    "source": "兴业证券往年暑期实习公告规律（约4月启动）及官网招聘频道；寒假批信息少，时间不确定",
    "confidence": "低"
@@ -410,7 +410,7 @@ window.DATA = {
    "salary": "约100-250元/天",
    "housing": "不包住宿，部分有餐补",
    "retention": "部分岗位实习转正性质，留用机会存在但反馈周期较长",
-   "applyLink": "https://campus.ebfcn.com",
+   "applyLink": "",
    "referral": "光大证券招聘（微信公众号）",
    "source": "搜狐财经2026-09报道（2027校招8月6日启动、网申至9月6日）及官网招聘频道",
    "confidence": "中"
@@ -500,7 +500,7 @@ window.DATA = {
    "salary": "约100-250元/天",
    "housing": "不包住宿，部分有餐补",
    "retention": "实习表现优异可获推荐寒假/暑期实习并争取留用",
-   "applyLink": "https://campus.swhysc.com",
+   "applyLink": "https://www.swhysc.com",
    "referral": "申万宏源招聘（微信公众号）",
    "source": "申万宏源2026届暑期实习提前批（2025-05-31截止）及债承实习帖（gongsichaxun）",
    "confidence": "低"
@@ -547,7 +547,7 @@ window.DATA = {
    "salary": "约100-250元/天",
    "housing": "不包住宿，部分有餐补",
    "retention": "实习表现优秀者有转正机会",
-   "applyLink": "https://campus.guosen.com.cn",
+   "applyLink": "https://www.guosen.com.cn",
    "referral": "国信证券招聘（微信公众号）",
    "source": "国信证券2027届校招（秋招网）及深圳分公司2023年寒假实习生招聘（深圳本地宝）",
    "confidence": "低"
@@ -775,7 +775,7 @@ window.DATA = {
    "salary": "约100-250元/天（投行实习本科220元/天、硕士250元/天；另有岗位约100-120元/天）",
    "housing": "不包住宿；财通资管外地实习学生有补贴，部分有餐补",
    "retention": "后备人才培养计划+实习表现优秀可留用",
-   "applyLink": "https://campus.ctsec.com",
+   "applyLink": "https://www.ctsec.com",
    "referral": "财通证券招聘（微信公众号）",
    "source": "财通证券2026校招启动公告（西电就业网2025-09-22）、投行实习生薪资（复旦校友网）、财通资管实习JD",
    "confidence": "中"
@@ -1111,7 +1111,7 @@ window.DATA = {
    "salary": "约150-250元/天",
    "housing": "无统一食宿",
    "retention": "较高，实习考察表现好可『预定offer』",
-   "applyLink": "https://career.gffunds.com.cn",
+   "applyLink": "https://gffunds.zhiye.com",
    "referral": "微信公众号「广发基金招聘」",
    "source": "港中深就业网2026暑期实习公告+中公教育春招公告（2026暑期/2027届秋招）",
    "confidence": "中"
@@ -2036,7 +2036,7 @@ window.DATA = {
    "salary": "补贴性质",
    "housing": "",
    "retention": "对秋招加分",
-   "applyLink": "https://job.psbc.com",
+   "applyLink": "https://www.psbc.com",
    "referral": "微信公众号「邮储银行招聘」",
    "source": "邮储银行招聘官网及银行招聘网/高校就业网分行公告，2026年批次",
    "confidence": "低"
@@ -2153,7 +2153,7 @@ window.DATA = {
    "salary": "补贴性质",
    "housing": "",
    "retention": "对秋招加分",
-   "applyLink": "https://zhaopin.cib.com.cn",
+   "applyLink": "https://www.cib.com.cn",
    "referral": "微信公众号「兴业银行招聘」",
    "source": "牛客网2026实习汇总帖及兴业银行官网，2026年暑期批",
    "confidence": "低"
@@ -2349,7 +2349,7 @@ window.DATA = {
    "salary": "约2-3K/月（暑期实习计划公告）",
    "housing": "",
    "retention": "实习表现对秋招加分；2027届秋招网申约2026-10-25截止，每人限投1个意向岗位",
-   "applyLink": "https://job.czbank.com",
+   "applyLink": "https://www.czbank.com",
    "referral": "微信公众号「浙商银行招聘」",
    "source": "浙商银行2027届暑期实习计划公告（经合肥工业大学就业网转载）及高顿2027秋招汇总",
    "confidence": "低"
@@ -2580,7 +2580,7 @@ window.DATA = {
    "salary": "",
    "housing": "",
    "retention": "校招录用流程中含实习环节",
-   "applyLink": "https://job.cpic.com.cn",
+   "applyLink": "https://www.cpic.com.cn",
    "referral": "微信公众号「中国太保招聘」",
    "source": "太平洋保险官网招聘频道及应届生求职网零散收录；寒假实习信息极少",
    "confidence": "低"
@@ -2658,7 +2658,7 @@ window.DATA = {
    "salary": "实习约100-150元/天（泰康人寿江苏分公司27届储备岗示例）",
    "housing": "",
    "retention": "储备干部实习对接2026届/2027届校招录用",
-   "applyLink": "https://campus.taikang.com",
+   "applyLink": "https://www.taikang.com",
    "referral": "微信公众号「泰康招聘」",
    "source": "泰康集团及子公司校招信息（LinkedIn、超级简历、应届生网收录），2026-2027届批次",
    "confidence": "低"
@@ -2695,7 +2695,7 @@ window.DATA = {
    "salary": "",
    "housing": "",
    "retention": "未明确",
-   "applyLink": "https://trust.citic.com",
+   "applyLink": "",
    "referral": "微信公众号「中信信托」",
    "source": "公开检索未获得中信信托2026年实习生招聘信息，信息极少；建议关注官网人才招聘栏目及公众号",
    "confidence": "低"
@@ -3286,7 +3286,7 @@ window.DATA = {
    "salary": "约100-150元/天（内资所中相对较高）",
    "housing": "一般不包食宿",
    "retention": "实习表现好可获校招优先考虑",
-   "applyLink": "https://www.tianzhi.org",
+   "applyLink": "https://www.tianzhi.com",
    "referral": "微信公众号：天职国际招聘（以官方认证账号为准）",
    "source": "天职国际官网；知乎「天健、天职国际、普华永道2025校招全解析」（2025年1月）；2026寒假批次未检索到明确公告",
    "confidence": "低"
@@ -4379,7 +4379,7 @@ window.DATA = {
    "salary": "实习补贴未公开，校招为炼化行业国企档",
    "housing": "生产基地多提供宿舍/工作餐",
    "retention": "中，校招为主要入口",
-   "applyLink": "https://www.rongshenggroup.com",
+   "applyLink": "https://www.rongsheng.com",
    "referral": "官方公众号「荣盛石化招聘」；实习僧/前程无忧官方账号",
    "source": "前程无忧名企校招频道及公开校招信息，2026届秋招季（约9-11月），无官方实习页",
    "confidence": "低"
@@ -5335,7 +5335,7 @@ window.DATA = {
    "salary": "",
    "housing": "",
    "retention": "暑期实习为校招储备",
-   "applyLink": "https://www.westsecu.com",
+   "applyLink": "https://www.westsecu.com.cn",
    "referral": "西部证券招聘（微信公众号）",
    "source": "牛奇招聘/浙大就业网：西部证券2026届春招&暑期实习生（2026-04-04至05-31）；LinkedIn投行实习帖",
    "confidence": "中"
@@ -6097,19 +6097,19 @@ window.DATA = {
     "org": "华泰证券",
     "channel": "公众号：华泰证券招聘；官网：job.htsc.com.cn",
     "note": "2027届校招已启动，含财富管理、机构业务及金融科技岗",
-    "url": "https://campus.htsc.com.cn"
+    "url": "https://job.htsc.com.cn"
    },
    {
     "org": "国泰海通",
     "channel": "公众号：国泰海通人才招聘",
     "note": "原国泰君安+海通合并后新主体，2026年8月已开金融科技条线2027届校招",
-    "url": "https://campus.gtjas.com"
+    "url": "https://www.gtht.com"
    },
    {
     "org": "招商证券",
     "channel": "公众号：招商证券招聘",
     "note": "发布总部及分支机构校招、实习信息",
-    "url": "https://careers.newone.com.cn"
+    "url": "https://www.newone.com.cn"
    },
    {
     "org": "广发证券",

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>页面跳转中… · 金融实习网申通</title>
+<script>
+  // 任何错误路径（包括链接尾部多了符号）自动回到主页
+  (function () {
+    var target = "/internship-tracker/";
+    var docPath = location.pathname.replace(/\/internship-tracker[^?]*/, "");
+    // 若是子路径（如 /internship-tracker/xxx），直接回主页并保留搜索词
+    location.replace(target + (location.search || ""));
+  })();
+</script>
+<style>
+  body { font-family: "PingFang SC", "Microsoft YaHei", sans-serif; background: #14304f; color: #fff; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center; }
+  a { color: #9ec3ea; }
+</style>
+</head>
+<body>
+<div>
+  <h1>正在带你回到「金融实习网申通」主页…</h1>
+  <p>如果页面没有自动跳转，<a href="/internship-tracker/">点这里进入</a></p>
+</div>
+</body>
+</html>
