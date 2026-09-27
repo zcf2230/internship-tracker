@@ -236,4 +236,5 @@ button { font-family: inherit; cursor: pointer; }
   .tl-months { margin-left: 110px; }
   .tl-name { font-size: 12px; }
   .progress-mini { margin-left: 0; }
+  .tag.cat { white-space: normal; }
 }
