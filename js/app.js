@@ -381,6 +381,19 @@
     return a.name.localeCompare(b.name, "zh");
   }
 
+  /* ---------- 「来源」标记 ----------
+     这个字段原本只显示「可信度低」，但那个「低」其实只说明一件事：
+     该公司的网申时间不是从官方公告抄来的，而是按同类机构往年的规律推算。
+     机构名、城市、主营、投递入口这些反而是靠谱的（还有 400+ 家官网是程序实测过的）。
+     一条笼统的「可信度低」把两件事混在一起，既吓人又没信息量，所以拆开写清楚。 */
+  var CONF_LABEL = { "高": "来源：官方公告", "中": "来源：公开报道", "低": "来源：规律推算" };
+  var CONF_TITLE = {
+    "高": "网申时间与用人要求来自该单位官方公告/招生简章",
+    "中": "网申时间与用人要求来自公开报道或官方招聘页，非逐家官方公告",
+    "低": "该公司不单独发公告，时间按同类机构往年规律推算；用人要求为同类机构通用规律"
+  };
+  var VERIFIED_TITLE = "官网链接由程序实测可访问（HTTP 200 且页面出现公司名），实测日期 2026-10-16";
+
   /* ---------- 渲染：公司库 ---------- */
   function renderCategories() {
     var cats = [];
@@ -389,7 +402,9 @@
       (c.tags || []).forEach(function (t) { if (cats.indexOf(t) < 0) cats.push(t); });
     });
     $("#categoryFilters").innerHTML = cats.map(function (cat) {
-      return '<button class="chip" data-cat="' + esc(cat) + '">' + esc(cat) + "</button>";
+      // 记住已选中的分类：分类条重建时要还原高亮，否则 UI 与 filters.cats 会不一致
+      var on = filters.cats.indexOf(cat) >= 0 ? " active" : "";
+      return '<button class="chip' + on + '" data-cat="' + esc(cat) + '">' + esc(cat) + "</button>";
     }).join("");
     // 城市下拉 = 高频真实城市 + 固定重点城市（含嘉兴），按岗位数排序
     var cityCount = {};
@@ -433,14 +448,18 @@
       if (c.salary) meta.push("💰 " + esc(c.salary));
       if (c.housing && /包|提供|住宿|餐/.test(c.housing)) meta.push("🏠 " + esc(c.housing));
       if (c.writtenTest) meta.push("✍️ 笔试: " + esc(c.writtenTest));
-      var conf = c.confidence && c.confidence !== "高" ? '<span class="tag conf-' + esc(c.confidence) + '">可信度' + esc(c.confidence) + "</span>" : "";
+      var conf = c.confidence
+        ? '<span class="tag conf-' + esc(c.confidence) + '" title="' + esc(CONF_TITLE[c.confidence] || "") + '">' +
+          esc(CONF_LABEL[c.confidence] || ("来源：" + c.confidence)) + "</span>"
+        : "";
+      var verified = c.linkVerified ? '<span class="tag verified" title="' + esc(VERIFIED_TITLE) + '">✓ 官网已实测</span>' : "";
       var extra = sbLine(c);
       return '<div class="company-card ' + cardBorderClass(st) + '" id="card-' + esc(c.id) + '">' +
         '<div class="card-head"><div class="card-title">' +
           "<h3>" + esc(c.name) + "</h3>" +
           '<span class="tag cat">' + esc(c.category) + " · " + esc(c.subcategory || "") + "</span>" +
           (c.category !== "小而美公司" && (c.tags || []).indexOf("小而美公司") >= 0
-            ? '<span class="tag sb">小而美公司</span>' : "") + conf +
+            ? '<span class="tag sb">小而美公司</span>' : "") + verified + conf +
         "</div>" +
         '<span class="status-pill ' + statusClass(st) + '">' + statusLabel(st) + "</span></div>" +
         '<div class="card-batches">' + (c.batches || []).map(batchLine).join("") + "</div>" +
@@ -488,8 +507,14 @@
         row("官方渠道", c.referral) + (c.applyLink ? '<dt>网申链接</dt><dd><a href="' + esc(c.applyLink) + '" target="_blank" rel="noopener">' + esc(c.applyLink) + "</a></dd>" : "") +
         row("城市", (c.cities || []).join(" / ")) +
       "</dl></div>" +
-      '<div class="source-note">🔎 ' + esc(c.source || "") + (c.confidence ? " · 信息可信度：" + esc(c.confidence) : "") +
-      "<br>⚠️ 以上为往年时间整理，投递前请以官方最新公告为准。</div>";
+      '<div class="source-note">🔎 ' + esc(c.source || "") +
+        "<br>📌 <b>网申时间与用人要求</b>：" + esc(CONF_LABEL[c.confidence] || "未标注") +
+        (CONF_TITLE[c.confidence] ? "　<span>（" + esc(CONF_TITLE[c.confidence]) + "）</span>" : "") +
+        "<br>🔗 <b>官网链接</b>：" +
+        (c.linkVerified ? "已由程序实测可访问（2026-10-16）"
+          : c.applyLink ? "来自公开资料整理，未逐条实测"
+            : "未收录，请用卡片上的「🔍 搜官方入口」按钮查找") +
+        "<br>⚠️ 以上为往年时间整理，投递前请以官方最新公告为准。</div>";
     $("#modal").hidden = false;
     $("#modalClose").onclick = closeModal;
   }
@@ -594,8 +619,8 @@
         if (stage === "none") delete progress[dragId];
         saveProgress(progress);
         dragId = null;
-        renderProgress();
-        renderList();
+        invalidateTab("progress");
+        invalidateTab("list");
       });
     });
   }
@@ -645,6 +670,35 @@
     $("#alertBar").innerHTML = "<ul><li>" + parts.join("</li><li>") + "</li></ul>";
   }
 
+  /* ---------- 标签页懒渲染 ----------
+     启动时只渲染当前可见的那个页签。原先 5 个页签开机时一次性全渲染，
+     可「投递进度」的 1064 张看板卡、「时间轴」的 1712 个色块、「渠道」「攻略」都不在首屏，
+     白白多花约 400ms 渲染时间和上万个 DOM 节点（实测总节点数 36441）。
+     现在改成切过去才渲染，切回来直接复用已渲好的 DOM。
+     任何会改动某页签数据的地方调 invalidateTab()：正在看的立刻重渲，没在看的等切过去再说。 */
+  var currentTab = "list";
+  var tabDirty = { list: false, timeline: true, progress: true, channels: true, guides: true };
+  var TAB_RENDERER = {
+    list: function () { renderList(); },
+    timeline: function () { renderTimeline(); },
+    progress: function () { renderProgress(); },
+    channels: function () { renderChannels(); },
+    guides: function () { renderGuides(); }
+  };
+  function ensureTab(tab) {
+    if (!TAB_RENDERER[tab] || !tabDirty[tab]) return;
+    tabDirty[tab] = false;
+    TAB_RENDERER[tab]();
+  }
+  function invalidateTab(tab) {
+    tabDirty[tab] = true;
+    if (tab === currentTab) ensureTab(tab);
+  }
+  function switchTab(tab) {
+    currentTab = tab;
+    ensureTab(tab);
+  }
+
   /* ---------- 事件绑定 ---------- */
   function bindEvents() {
     $$(".tab").forEach(function (t) {
@@ -653,8 +707,7 @@
         $$(".tab-pane").forEach(function (x) { x.classList.remove("active"); });
         t.classList.add("active");
         $("#tab-" + t.dataset.tab).classList.add("active");
-        if (t.dataset.tab === "timeline") renderTimeline();
-        if (t.dataset.tab === "progress") renderProgress();
+        switchTab(t.dataset.tab);
       };
     });
     $("#searchBox").oninput = function () { filters.q = this.value.trim(); renderList(); };
@@ -696,7 +749,8 @@
         if (progress[cid] && progress[cid].stage === stage) delete progress[cid];
         else progress[cid] = { stage: stage, updated: new Date().toISOString() };
         saveProgress(progress);
-        renderList();
+        invalidateTab("list");
+        invalidateTab("progress");
       }
     };
     $("#modalMask").onclick = closeModal;
@@ -716,12 +770,10 @@
     // 数据行补 id
     DATA.companies.forEach(function (c, i) { if (!c.id) c.id = "c" + i; applyDefaults(c); });
     try { kanbanCat = JSON.parse(localStorage.getItem(LS_KEY + "_kanbanCat")) || {}; } catch (e) { kanbanCat = {}; }
+    // 只渲染首屏可见的「公司库」；其余 4 个页签等用户点过去再渲染（见 ensureTab）
     renderCategories();
     renderAlert();
     renderList();
-    renderChannels();
-    renderGuides();
-    renderProgress();
     bindEvents();
     // 返回顶部
     var backTop = $("#backTop");
@@ -758,8 +810,9 @@
           Object.keys(nf).forEach(function (k) { favorites[k] = 1; fCount++; });
           saveProgress(progress);
           saveFavorites();
-          renderList();
-          renderProgress();
+          // 进度和收藏都变了：两个页签都标脏（当前看的会立刻重渲）
+          invalidateTab("list");
+          invalidateTab("progress");
           alert("恢复完成：导入 " + pCount + " 条投递进度、" + fCount + " 个收藏。");
         } catch (err) {
           alert("导入失败：" + err.message + "。请确认选择的是本站导出的备份文件。");
@@ -790,12 +843,27 @@
           base, { name: "AES-GCM", length: 256 }, true, ["decrypt"]);
       });
   }
+  // v2 数据是「先 gzip 再加密」的（见 tools/encrypt-data.js），解密出来要解压。
+  // 用浏览器原生的 DecompressionStream，不引入任何第三方库。
+  function gunzip(buf) {
+    if (typeof DecompressionStream === "undefined") {
+      return Promise.reject(new Error("浏览器太旧：不支持 gzip 解压，请用新版 Chrome / Edge / Safari"));
+    }
+    var stream = new Blob([buf]).stream().pipeThrough(new DecompressionStream("gzip"));
+    return new Response(stream).arrayBuffer().then(function (ab) {
+      return new TextDecoder().decode(ab);
+    });
+  }
   function decryptData(key) {
     var enc = window.ENC_DATA;
     var ct = b64ToBuf(enc.ct);
     return crypto.subtle.decrypt({ name: "AES-GCM", iv: b64ToBuf(enc.iv) }, key, ct)
       .then(function (plain) {
-        window.DATA = JSON.parse(new TextDecoder().decode(plain));
+        // 老格式（没有 zip 标记）解出来就是 JSON 文本；新格式要先 gunzip
+        return enc.zip === "gzip" ? gunzip(plain) : new TextDecoder().decode(plain);
+      })
+      .then(function (txt) {
+        window.DATA = JSON.parse(txt);
         DATA = window.DATA; // 同步闭包变量（加载时指向空对象）
         return true;
       });

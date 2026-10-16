@@ -34,8 +34,9 @@ node tools/build-more.js          # more-src-*.txt -> tools/raw/more.json（原�
 node tools/verify-links.js        # ⭐ 实测官网域名（link-candidates-*.txt -> tools/links.json）
 node tools/verify-links-render.js # ⭐ 第二轮：对 SPA / 被 WAF 拦的候选，用 Edge 无头渲染后复验
 node tools/build-data.js          # raw/*.json -> tools/data.json（合并 + 去重 + 双向打标签 + 套用实测链接）
-node tools/encrypt-data.js        # data.json -> js/data.enc.js（AES-256-GCM，加密前先压缩）
-node tools/check-data.js          # 自检：解密并核对条数 / 重复 / 字段完整性 / 直链覆盖率（无依赖）
+node tools/encrypt-data.js        # data.json -> js/data.enc.js（**先 gzip 再 AES-256-GCM**，见下）
+node tools/check-data.js          # 自检：解密 + 核对条数与字段完整性 + 直链覆盖率 + 加密包体积守卫（无依赖）
+node tools/test-decrypt.js        # 自检：用与浏览器相同的 WebCrypto+DecompressionStream 走一遍解密链路（无依赖）
 ```
 
 ### 官网直链是怎么来的（tools/verify-links.js）
@@ -54,6 +55,27 @@ node tools/check-data.js          # 自检：解密并核对条数 / 重复 / �
 5. 实在测不出正确域名的机构，就**保持只有「🔍 搜官方入口」按钮**（跳必应搜官方招聘入口），不猜、不写错。
 
 > ⚠️ 改完 `tools/data.json` **必须重跑 `encrypt-data.js`**，否则网页上是旧数据（`check-data.js` 会帮你发现）。
+
+### 为什么要「先压缩再加密」（启动速度的关键）
+
+AES-GCM 的密文是伪随机的、**完全不可压缩**，所以顺序错一步，体积就差近十倍：
+
+```
+❌ 明文 620KB → 加密 620KB → base64 830KB      （HTTP 层也压不动，下载 ≈ 1280KB）
+✅ 明文 620KB → gzip 96KB → 加密 96KB → base64 128KB
+```
+
+1064 家机构时，老管线产物 **1196KB**。实测国内直连 GitHub Pages 大约只有 20–65 KB/s，
+等于**每次打开本站都要先下 20 秒左右**，界面才会出来。改成先 gzip 之后产物 **128KB**，
+下载降到 2–6 秒；浏览器端用原生的 `DecompressionStream("gzip")` 解压，不需要任何第三方库。
+
+`tools/check-data.js` 里有一条**体积守卫**（加密包必须 < 300KB），
+以后谁把管线改回「直接加密」会立刻报错。
+
+**前端还有一处配套优化**：5 个页签不再在开机时一次性全渲染。
+「投递进度」1064 张看板卡、「时间轴」1712 个色块、渠道与攻略页都不在首屏，
+原来却要一并渲染（实测多花约 400ms、多 7000+ 个 DOM 节点）。现在切过去才渲染（`ensureTab`），
+切回来直接复用。任何改动页签数据的地方调 `invalidateTab()` 标脏即可。
 > 只在本地看效果不想加密时，也可直接跑 `python -m http.server 8765`，但线上数据是密文版。
 
 ### 「小而美公司」怎么维护
@@ -102,4 +124,15 @@ python -m http.server 8765
 
 ## 数据免责声明
 
-时间为**往年网申时间整理推算**，仅供参考；每年批次会有浮动，投递前务必以各公司官方招聘渠道最新公告为准。每家公司卡片标注了信息来源与可信度。
+时间为**往年网申时间整理推算**，仅供参考；每年批次会有浮动，投递前务必以各公司官方招聘渠道最新公告为准。
+
+### 卡片上的两个标记分别是什么意思
+
+一个笼统的「可信度低」把两件不同的事混在了一起，所以拆成两个独立标记：
+
+| 标记 | 含义 |
+|---|---|
+| `✓ 官网已实测` | 这家的官网链接是**程序实测过能访问**的（HTTP 200 且页面出现公司名），实测日期见卡片提示。共 405 家 |
+| `来源：官方公告` / `公开报道` / `规律推算` | 说明该公司的**网申时间与用人要求**是从哪儿来的。绝大多数中小机构不单独发公告，只能按同类机构往年规律推算——这是这类数据的固有性质，不代表这家公司本身不可靠 |
+
+筛选区有图例直接解释这两列标记；详情弹窗底部会写清楚这家具体是哪种情况、官网有没有实测过。

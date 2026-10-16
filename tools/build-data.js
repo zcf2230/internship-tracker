@@ -133,6 +133,11 @@ companies.forEach(c => {
   if (u && /^https?:\/\//.test(u)) {
     if (c.applyLink) linkFixed++; else linkAdded++;
     c.applyLink = u;
+    // 这家机构的官网/招生页是「程序实测过能访问」的（见 tools/verify-links.js 的三层校验），
+    // 和原作者人工整理、或从公开资料推断出来的条目区分开——卡片上会给一个「官网已实测」的标记。
+    c.linkVerified = true;
+  } else if (c.linkVerified) {
+    delete c.linkVerified;   // 名单调整后不再是实测来源的，标记要撤掉，避免虚标
   }
 });
 

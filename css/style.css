@@ -118,8 +118,17 @@ button { font-family: inherit; cursor: pointer; }
 }
 .tag.cat { background: var(--gray-soft); color: var(--ink-2); }
 .tag.sb { background: var(--blue-soft); color: var(--blue); }   /* 「小而美公司」附加分类标记 */
-.tag.conf-中 { background: var(--gold-soft); color: var(--gold); }
-.tag.conf-低 { background: var(--red-soft); color: var(--red); }
+.tag.conf-高 { background: var(--blue-soft); color: var(--blue); }   /* 官方公告口径 */
+.tag.conf-中 { background: var(--gold-soft); color: var(--gold); }   /* 公开报道口径 */
+/* 「规律推算」用中性灰而不是红色：它只说明该单位不单独发公告、时间按同类往年规律推算，
+   不代表这家公司或这条记录不可靠（官网、城市、主营反而多数是实测/公开资料确认过的）。 */
+.tag.conf-低 { background: var(--gray-soft); color: var(--ink-3); }
+.tag.verified { background: var(--green-soft); color: var(--green); }   /* 官网经程序实测可访问 */
+
+/* 图例：在页面里解释上面几个标记的含义，省得看到「来源：规律推算」一头雾水 */
+.legend { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 12px; color: var(--ink-3); margin-top: 10px; line-height: 1.9; }
+.legend > span { display: inline-flex; align-items: center; gap: 6px; }
+.legend .tag { font-size: 11px; }
 .status-pill {
   font-size: 12.5px; font-weight: 600; padding: 3px 12px; border-radius: 999px; white-space: nowrap;
 }

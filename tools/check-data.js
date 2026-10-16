@@ -15,6 +15,7 @@
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
+const zlib = require("zlib");
 
 const ROOT = path.join(__dirname, "..");
 const SB_CAT = "小而美公司";
@@ -28,7 +29,11 @@ function decrypt() {
   const ct = Buffer.from(m[3], "base64");
   const dec = crypto.createDecipheriv("aes-256-gcm", key, Buffer.from(m[2], "base64"));
   dec.setAuthTag(ct.slice(ct.length - 16));
-  return JSON.parse(Buffer.concat([dec.update(ct.slice(0, ct.length - 16)), dec.final()]).toString("utf8"));
+  const plain = Buffer.concat([dec.update(ct.slice(0, ct.length - 16)), dec.final()]);
+  // v2 是「先 gzip 再加密」（见 tools/encrypt-data.js），解出来要先解压——和浏览器端
+  // 的 DecompressionStream("gzip") 对应；老格式没有 zip 标记，直接当 JSON 文本处理。
+  const txt = /zip:"gzip"/.test(src) ? zlib.gunzipSync(plain).toString("utf8") : plain.toString("utf8");
+  return JSON.parse(txt);
 }
 
 const fails = [];
@@ -72,8 +77,16 @@ check("其余 " + (cs.length - sb.length) + " 家老数据未被破坏", cs.filt
 const withLink = cs.filter(c => c.applyLink && /^https?:\/\//.test(c.applyLink));
 check("官网直链覆盖 " + withLink.length + "/" + cs.length + "（实测验证过的域名）", withLink.length > 300);
 check("直链格式都合法", withLink.every(c => c.applyLink.length > 12));
+const verified = cs.filter(c => c.linkVerified);
+check("实测确认的链接都带 linkVerified 标记 " + verified.length + " 家", verified.length > 300 && verified.every(c => c.applyLink));
+// 体积守卫：AES-GCM 密文不可压缩，所以必须「先 gzip 再加密」，
+// 直接加密 600KB 明文会产出 800KB+ 密文、base64 后过 1MB，国内访问 GitHub Pages 要 20 秒。
+const encSize = fs.statSync(path.join(ROOT, "js", "data.enc.js")).size;
+check("加密包体积 " + (encSize / 1024).toFixed(0) + " KB < 300KB（gzip 管线生效）", encSize < 300 * 1024,
+  encSize > 300 * 1024 ? "太大了！检查 tools/encrypt-data.js 是不是漏了 gzip" : "");
 check("updatedAt 已更新", !!data.updatedAt, data.updatedAt);
-check("渠道与攻略仍在", !!(data.channels && data.guides.length));
+check("渠道与攻略仍在", !!(data.channels && data.guides.length),
+  (data.channels ? Object.keys(data.channels).length : 0) + " 组渠道 / " + (data.guides || []).length + " 篇攻略");
 
 console.log("");
 console.log("分类分布：");
