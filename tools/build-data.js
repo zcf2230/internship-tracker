@@ -70,7 +70,7 @@ function companiesFrom(file) {
   });
 }
 
-const files = ["brokers.json", "funds.json", "banks.json", "big4.json", "dachang.json", "region.json", "brokers2.json", "buyout.json", "tech.json", "soe.json", "smallbeauty.json"];
+const files = ["brokers.json", "funds.json", "banks.json", "big4.json", "dachang.json", "region.json", "brokers2.json", "buyout.json", "tech.json", "soe.json", "smallbeauty.json", "more.json"];
 let companies = [];
 for (const f of files) companies = companies.concat(companiesFrom(f));
 
@@ -89,6 +89,52 @@ companies = companies.filter(c => {
   return !hasOther.has(c.name);   // 名单里与已有公司重名的，丢弃重复卡
 });
 const sbNew = companies.filter(c => c.category === SB_CAT).length;
+
+/* ⭐「小而美公司」的条目按细分领域挂上它天然所属的**原分类**标签。
+ * 例如「城商行农商行」的小而美条目同时属于「银行/保险/信托」，
+ * 「中小券商」同时属于「券商/投行」——双向归属，两边 chip 都能筛到，且不重复建卡。
+ * 不映射的细分（如金融基础设施）就只留在「小而美公司」里。 */
+const SB_SECONDARY = {
+  "量化私募": "基金/资管/PE·VC",
+  "私募证券": "基金/资管/PE·VC",
+  "PE·VC": "基金/资管/PE·VC",
+  "中小公募资管": "基金/资管/PE·VC",
+  "精品投行FA": "券商/投行",
+  "中小券商": "券商/投行",
+  "精品咨询研究": "四大/咨询",
+  "评级信评": "四大/咨询",
+  "会计师事务所": "四大/咨询",
+  "金融科技数据": "大厂/金融科技",
+  "消费金融": "银行/保险/信托",
+  "融资租赁": "银行/保险/信托",
+  "保险资管": "银行/保险/信托",
+  "城商行农商行": "银行/保险/信托",
+  "信托AMC": "银行/保险/信托"
+};
+let sbSecondaryTagged = 0;
+companies.forEach(c => {
+  if (c.category !== SB_CAT) return;
+  const sec = SB_SECONDARY[c.subcategory];
+  if (sec && c.tags.indexOf(sec) < 0) { c.tags.push(sec); sbSecondaryTagged++; }
+});
+
+
+/* ⭐ 官网直链：tools/links.json（由 tools/verify-links.js 实测产生：能访问 200 且页面含公司名）
+ * 优先级高于原始数据里的 applyLink —— 既用来「补」原来没链接的机构，也用来「修」失效的旧链接。
+ * links.json 是明文（含公司名），按本站约定不进仓库，已在 .gitignore。 */
+const LINK_OVERRIDES = (() => {
+  const p = path.join(__dirname, "links.json");
+  if (!fs.existsSync(p)) return {};
+  try { return JSON.parse(fs.readFileSync(p, "utf8")); } catch (e) { console.error("links.json 解析失败，忽略：", e.message); return {}; }
+})();
+let linkAdded = 0, linkFixed = 0;
+companies.forEach(c => {
+  const u = LINK_OVERRIDES[c.name];
+  if (u && /^https?:\/\//.test(u)) {
+    if (c.applyLink) linkFixed++; else linkAdded++;
+    c.applyLink = u;
+  }
+});
 
 let channels = {}, guides = [];
 const chFile = path.join(RAW, "channels.json");
@@ -109,4 +155,8 @@ companies.forEach(c => {
   if (cats.indexOf(c.category) < 0) cats.push(c.category);
   c.tags.forEach(t => { if (cats.indexOf(t) < 0) cats.push(t); });
 });
-console.log(`OK: ${companies.length} 家公司（「小而美公司」共 ${sb} 家 = 新建 ${sbNew} + 并入已有 ${sbMerged}），${cats.length} 个分类，${guides.length} 篇攻略，渠道 ${(channels.official || []).length + (channels.platforms || []).length + (channels.referral || []).length} 条 -> ${OUT}`);
+const withLink = companies.filter(c => c.applyLink).length;
+const chCount = (channels.official || []).length + (channels.platforms || []).length + (channels.referral || []).length;
+console.log(`OK: ${companies.length} 家公司（「小而美公司」共 ${sb} 家 = 新建 ${sbNew} + 并入已有 ${sbMerged}；另有 ${sbSecondaryTagged} 条挂了原分类标签）`);
+console.log(`    ${cats.length} 个分类，${guides.length} 篇攻略，渠道 ${chCount} 条 -> ${OUT}`);
+console.log(`    官网直链 ${withLink}/${companies.length}（实测新增 ${linkAdded}、修正失效 ${linkFixed}）`);

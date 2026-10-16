@@ -236,11 +236,78 @@
       retention: "以校招为主，事业/公司制平台"
     }
   };
+  /* ---------- 原有 7 个分类扩充分类的用人要求兜底 ----------
+     与「小而美公司」同理：这批新增条目不再逐条重复写通用用人要求，
+     按**主分类**兜底；逐家拿到官方口径时直接写进数据即可覆盖。
+     可信度由数据里的 confidence 决定（带公开报道口径的标「中」，其余「低」）。 */
+  var EXTRA_SOURCE = "公司公开信息（官网 / 招聘公告 / 公开报道）整理；" +
+    "批次时间为同类机构规律推算，用人要求为同主分类通用规律，未逐家核实";
+  var EXTRA_DEFAULTS = {
+    "券商/投行": {
+      degree: "研究所与投行岗硕士优先，部分实习岗本科可投",
+      major: "金融/经济/财会/法律，理工复合加分",
+      certs: "证券从业资格优先，CPA/CFA/法考加分",
+      skills: "Wind、Excel、PPT、财务建模、报告写作",
+      retention: "实习表现优秀可留用，暑期实习是留用主渠道"
+    },
+    "基金/资管/PE·VC": {
+      degree: "研究/投资岗硕士及以上为主，销售与运营岗本科可投",
+      major: "金融/经济/财会/统计，理工复合加分",
+      certs: "基金从业资格优先，CFA/CPA 加分",
+      skills: "Wind、财务分析、财务与估值建模，量化岗需 Python",
+      retention: "研究员与投资岗主要靠长期实习转正"
+    },
+    "银行/保险/信托": {
+      degree: "本科及以上（应届），总行与管培生岗偏好硕士",
+      major: "金融/经济/财会/管理/计算机，部分岗位专业不限",
+      certs: "银行从业/证券从业资格优先，精算岗看精算师考试科目",
+      skills: "Excel、沟通与营销、基础财务分析，科技岗需 SQL 或编程",
+      retention: "校招培养体系完整，实习表现优秀可留用"
+    },
+    "四大/咨询": {
+      degree: "本科及以上，硕士优先",
+      major: "专业不限，财会/金融/经济/统计/管理优先",
+      certs: "会计线看 CPA 通过科目，咨询线无硬性证书要求",
+      skills: "Excel/PPT、案头研究、财务分析、英文报告",
+      retention: "实习转正是主要入口，寒假实习表现好可锁定后续机会"
+    },
+    "大厂/金融科技": {
+      degree: "本科及以上，技术/数据岗偏好硕士",
+      major: "金融/经济/统计/计算机，复合背景优先",
+      certs: "无硬性证书要求",
+      skills: "数据分析（SQL/Python）、产品与运营思维，财务岗看 Excel 建模",
+      retention: "暑期实习是主要入口，实习转正比例较高"
+    },
+    "上市公司": {
+      degree: "本科及以上，总部职能岗偏好硕士",
+      major: "财会/金融/经济/法律/管理，行业对口专业加分",
+      certs: "CPA/CFA 加分，证券事务岗看董秘资格",
+      skills: "财务分析、Excel、财务建模，证券事务岗需写作与信息披露基础",
+      retention: "以校招与实习转正为主，总部职能岗机会少于金融机构"
+    },
+    "央国企": {
+      degree: "本科及以上，多数单位偏好硕士",
+      major: "金融/经济/财会/管理/法律，理工科对口专业加分",
+      certs: "部分岗位看 CPA/CFA 等职业资格",
+      skills: "财务与资金管理、数据分析、公文写作与合规意识",
+      retention: "以校招为主，部分单位有统一笔试与政审环节"
+    }
+  };
+
   function applyDefaults(c) {
-    if (c.category !== "小而美公司") return;
-    var d = SB_DEFAULTS[c.subcategory];
-    if (d) { for (var k in d) { if (!c[k]) c[k] = d[k]; } }
-    if (!c.source) c.source = SB_SOURCE;
+    var k;
+    if (c.category === "小而美公司") {
+      var d = SB_DEFAULTS[c.subcategory];
+      if (d) { for (k in d) { if (!c[k]) c[k] = d[k]; } }
+      if (!c.source) c.source = SB_SOURCE;
+      return;
+    }
+    // 原有 7 个分类里的扩充分类：按主分类兜底（已有精心整理的条目字段齐全，不会被覆盖）
+    var e = EXTRA_DEFAULTS[c.category];
+    if (e) {
+      for (k in e) { if (!c[k]) c[k] = e[k]; }
+      if (!c.source) c.source = EXTRA_SOURCE;
+    }
   }
   // 卡片/详情里那行「主营 · 适合投递 · 体量」
   function sbLine(c) {

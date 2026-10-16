@@ -4,3 +4,12 @@ tools/auth.txt
 js/data.js
 # 「小而美公司」人工维护的明文源清单（596 家），与 raw/ 同理：只留本地，仓库只存密文
 tools/sbc-src.txt
+# 原有 7 个分类的扩充明文源清单（335 家）
+tools/more-src-1.txt
+tools/more-src-2.txt
+# 官网域名实测结果与候选表（含公司名，明文，按本站约定不进仓库）
+tools/links.json
+tools/link-candidates-*.txt
+tools/link-verify-report.txt
+tools/link-manual.txt
+tools/link-verify-render-report.txt

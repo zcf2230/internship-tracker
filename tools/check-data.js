@@ -69,6 +69,9 @@ check("新建条目批次为全年滚动", sbNew.every(c => (c.batches || []).so
 check("新建条目都标了可信度", sbNew.every(c => c.confidence));
 check("并入的老条目保留主分类与原批次", sbMerged.every(c => c.category !== SB_CAT && (c.batches || []).length > 0));
 check("其余 " + (cs.length - sb.length) + " 家老数据未被破坏", cs.filter(c => !inCat(c, SB_CAT)).every(c => c.category && c.batches));
+const withLink = cs.filter(c => c.applyLink && /^https?:\/\//.test(c.applyLink));
+check("官网直链覆盖 " + withLink.length + "/" + cs.length + "（实测验证过的域名）", withLink.length > 300);
+check("直链格式都合法", withLink.every(c => c.applyLink.length > 12));
 check("updatedAt 已更新", !!data.updatedAt, data.updatedAt);
 check("渠道与攻略仍在", !!(data.channels && data.guides.length));
 
