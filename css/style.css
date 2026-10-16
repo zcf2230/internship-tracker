@@ -117,6 +117,7 @@ button { font-family: inherit; cursor: pointer; }
   background: var(--blue-soft); color: var(--blue);
 }
 .tag.cat { background: var(--gray-soft); color: var(--ink-2); }
+.tag.sb { background: var(--blue-soft); color: var(--blue); }   /* 「小而美公司」附加分类标记 */
 .tag.conf-中 { background: var(--gold-soft); color: var(--gold); }
 .tag.conf-低 { background: var(--red-soft); color: var(--red); }
 .status-pill {
@@ -131,6 +132,8 @@ button { font-family: inherit; cursor: pointer; }
 .card-batches b { color: var(--ink); font-weight: 600; }
 .card-batches .win { font-family: Consolas, monospace; color: var(--blue); }
 .card-meta { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--ink-2); margin: 6px 0 10px; }
+/* 机构信息行（主营 / 适合投递 / 体量）——「小而美公司」等中小机构靠这行看性价比 */
+.card-extra { font-size: 13px; color: var(--ink-2); line-height: 1.7; margin: 4px 0 10px; padding: 8px 10px; background: var(--gray-soft); border-radius: 8px; }
 .card-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 .btn {
   border: none; border-radius: 8px; padding: 7px 14px; font-size: 13.5px; font-weight: 600;

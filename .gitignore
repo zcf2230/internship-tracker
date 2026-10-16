@@ -2,3 +2,5 @@ tools/raw/
 tools/data.json
 tools/auth.txt
 js/data.js
+# 「小而美公司」人工维护的明文源清单（596 家），与 raw/ 同理：只留本地，仓库只存密文
+tools/sbc-src.txt

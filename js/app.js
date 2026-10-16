@@ -116,8 +116,150 @@
     return { opening: "opening", rolling: "opening", soon: "soon", closed: "", unknown: "" }[st.state];
   }
 
+  /* ---------- 「小而美公司」分类：通用用人要求兜底 ----------
+     596 家中小机构没法逐家核实用人要求，把共性部分按细分领域写在这里，
+     渲染时只填该家为空的字段——逐家拿到官方信息时，直接写进数据即可覆盖。
+     全部条目标可信度「低」，详情页底部会注明这是同类机构通用规律推断。 */
+  var SB_SOURCE = "机构名单与主营方向整理自公开资料（公司官网、监管持牌/备案名单、行业榜单等）；" +
+    "用人要求为同类机构通用规律推断，未经该机构官方确认，投递前请以官网为准";
+  var SB_DEFAULTS = {
+    "量化私募": {
+      degree: "以硕士/博士在读为主，数学、物理、计算机、统计背景优先",
+      major: "数学/统计/物理/计算机/金融工程等理工科背景为主",
+      certs: "无硬性证书要求",
+      skills: "Python/C++、机器学习、统计建模、算法与数据结构",
+      retention: "多为长期日常实习后转正，实习是主要招聘入口"
+    },
+    "私募证券": {
+      degree: "投研岗以硕士在读为主，偏好有相关行业研究经历",
+      major: "金融/经济/财会，理工科复合背景加分",
+      certs: "CFA/CPA 加分",
+      skills: "财务分析、行业研究、Wind、研究报告写作",
+      retention: "实习表现优秀可转正，投研岗多为长期实习考察"
+    },
+    "PE·VC": {
+      degree: "本科及以上，投资岗偏好硕士在读",
+      major: "金融/经济/理工复合，偏好有产业或投行实习经历",
+      certs: "CFA/CPA 加分",
+      skills: "行业研究、财务与估值建模、Wind/企查查、PPT",
+      retention: "投资岗以实习转正为主要入口"
+    },
+    "中小公募资管": {
+      degree: "研究岗硕士及以上为主，销售与运营岗本科可投",
+      major: "金融/经济/财会/统计",
+      certs: "基金从业资格优先，CFA/CPA 加分",
+      skills: "Wind、财务分析、渠道沟通，量化岗需 Python",
+      retention: "研究员岗多通过长期实习选拔后转正"
+    },
+    "精品投行FA": {
+      degree: "本科及以上，大四保研/研一时间充裕者优先",
+      major: "金融/经济/财会，理工科复合加分",
+      certs: "无硬性证书要求，CFA/CPA 加分",
+      skills: "Excel 财务模型、PPT、行业研究、英文材料阅读",
+      retention: "暑期/日常实习转正是主要招聘入口"
+    },
+    "中小券商": {
+      degree: "研究所与投行岗硕士优先，部分实习岗本科可投",
+      major: "金融/经济/财会/法律，理工复合加分",
+      certs: "证券从业资格优先，CPA/CFA/法考加分",
+      skills: "Wind、Excel、PPT、财务建模、报告写作",
+      retention: "研究所实习通过答辩或考核后可留用"
+    },
+    "精品咨询研究": {
+      degree: "本科及以上，硕士优先",
+      major: "专业不限，金融/经济/统计/管理优先",
+      certs: "无硬性证书要求",
+      skills: "案头研究、专家访谈、Excel/PPT、英文报告",
+      retention: "实习转正为主，表现优秀可提前拿全职 Offer"
+    },
+    "评级信评": {
+      degree: "硕士优先，财务或金融背景",
+      major: "金融/经济/财会",
+      certs: "CPA/CFA 加分",
+      skills: "财务分析、Excel、信用评级与行业分析方法",
+      retention: "实习后转正是常见入口"
+    },
+    "金融科技数据": {
+      degree: "本科及以上，技术岗偏好硕士",
+      major: "金融/经济/统计/计算机，复合背景优先",
+      certs: "无硬性证书要求",
+      skills: "Excel/SQL、数据分析、产品运营，研发岗需编程",
+      retention: "实习转正与社招并行"
+    },
+    "消费金融": {
+      degree: "本科及以上",
+      major: "金融/经济/财会/统计/计算机",
+      certs: "无硬性证书要求",
+      skills: "数据分析、风控逻辑、Excel/SQL、产品沟通",
+      retention: "校招生培养体系较完整，实习可转正"
+    },
+    "融资租赁": {
+      degree: "本科及以上（业务岗接受应届本科）",
+      major: "金融/经济/财会/市场营销，业务岗专业不限",
+      certs: "无硬性证书要求",
+      skills: "客户开发、财务与资信分析、Excel、沟通谈判",
+      retention: "业务岗以校招+实习为主，业绩考核明确"
+    },
+    "保险资管": {
+      degree: "本科及以上，精算岗偏好硕士",
+      major: "金融/保险/精算/统计，健康险相关可接受医学背景",
+      certs: "精算师/CPA 等加分",
+      skills: "精算与数据分析、Excel、产品与合规、沟通",
+      retention: "校招与实习并行"
+    },
+    "城商行农商行": {
+      degree: "本科及以上（应届）",
+      major: "金融/经济/财会/管理，多数岗位专业不限",
+      certs: "银行从业资格优先",
+      skills: "Excel、沟通与营销、基础财务分析",
+      retention: "管培生/校招生培养体系完整，转正率高"
+    },
+    "信托AMC": {
+      degree: "硕士优先",
+      major: "金融/经济/财会/法律",
+      certs: "CPA/法考加分",
+      skills: "财务与尽调分析、Excel、法律与合规基础",
+      retention: "实习表现优秀可转正"
+    },
+    "会计师事务所": {
+      degree: "本科及以上（应届）",
+      major: "会计/财会/审计/金融，多数岗位专业不限",
+      certs: "CPA 通过部分科目优先",
+      skills: "会计准则与审计流程、Excel、CPA 科目学习",
+      retention: "实习转正是主要入口，CPA 通过科目有加分"
+    },
+    "金融基础设施": {
+      degree: "硕士及以上为主",
+      major: "金融/经济/统计/计算机",
+      certs: "证券/基金从业资格优先",
+      skills: "数据分析、行业研究、规则文档理解",
+      retention: "以校招为主，事业/公司制平台"
+    }
+  };
+  function applyDefaults(c) {
+    if (c.category !== "小而美公司") return;
+    var d = SB_DEFAULTS[c.subcategory];
+    if (d) { for (var k in d) { if (!c[k]) c[k] = d[k]; } }
+    if (!c.source) c.source = SB_SOURCE;
+  }
+  // 卡片/详情里那行「主营 · 适合投递 · 体量」
+  function sbLine(c) {
+    var parts = [];
+    if (c.biz) parts.push("主营：" + esc(c.biz));
+    if (c.jobs) parts.push("适合投递：" + esc(c.jobs));
+    if (c.scale) parts.push("体量：≈" + esc(c.scale));
+    if (c.note) parts.push("备注：" + esc(c.note));
+    return parts.join("　·　");
+  }
+
   /* ---------- 筛选 ---------- */
   var filters = { q: "", cats: [], city: "", batch: "", degree: "", test: "", hz: "", status: "" };
+  // 一家公司可以在多个分类里出现：category 是主分类，tags 是附加分类
+  // （例如宁波银行主分类是「银行/保险/信托」，同时挂了 tag「小而美公司」）
+  function inCat(c, cat) {
+    if (c.category === cat) return true;
+    return (c.tags || []).indexOf(cat) >= 0;
+  }
   function isBachelorOk(c) {
     return /本科可投|本科即可|本科在读可投|本科生可投|学历不限|不限学历|本科及以上|本科为主|对本科/.test(String(c.degree || ""));
   }
@@ -133,10 +275,15 @@
   function matchCompany(c) {
     var st = companyStatus(c);
     if (filters.q) {
-      var hay = [c.name, c.subcategory, (c.cities || []).join(" "), c.major, c.skills, c.degree].join(" ").toLowerCase();
+      var hay = [c.name, c.subcategory, (c.cities || []).join(" "), c.major, c.skills, c.degree,
+        c.biz, c.jobs, c.scale, c.note, (c.tags || []).join(" ")].join(" ").toLowerCase();
       if (hay.indexOf(filters.q.toLowerCase()) < 0) return false;
     }
-    if (filters.cats.length && filters.cats.indexOf(c.category) < 0) return false;
+    if (filters.cats.length) {
+      var hit = false;
+      for (var i = 0; i < filters.cats.length; i++) { if (inCat(c, filters.cats[i])) { hit = true; break; } }
+      if (!hit) return false;
+    }
     if (filters.city && (c.cities || []).indexOf(filters.city) < 0) return false;
     if (filters.batch) {
       var has = (c.batches || []).some(function (b) { return b.type && b.type.indexOf(filters.batch) >= 0; });
@@ -170,7 +317,10 @@
   /* ---------- 渲染：公司库 ---------- */
   function renderCategories() {
     var cats = [];
-    DATA.companies.forEach(function (c) { if (cats.indexOf(c.category) < 0) cats.push(c.category); });
+    DATA.companies.forEach(function (c) {
+      if (cats.indexOf(c.category) < 0) cats.push(c.category);
+      (c.tags || []).forEach(function (t) { if (cats.indexOf(t) < 0) cats.push(t); });
+    });
     $("#categoryFilters").innerHTML = cats.map(function (cat) {
       return '<button class="chip" data-cat="' + esc(cat) + '">' + esc(cat) + "</button>";
     }).join("");
@@ -217,14 +367,18 @@
       if (c.housing && /包|提供|住宿|餐/.test(c.housing)) meta.push("🏠 " + esc(c.housing));
       if (c.writtenTest) meta.push("✍️ 笔试: " + esc(c.writtenTest));
       var conf = c.confidence && c.confidence !== "高" ? '<span class="tag conf-' + esc(c.confidence) + '">可信度' + esc(c.confidence) + "</span>" : "";
+      var extra = sbLine(c);
       return '<div class="company-card ' + cardBorderClass(st) + '" id="card-' + esc(c.id) + '">' +
         '<div class="card-head"><div class="card-title">' +
           "<h3>" + esc(c.name) + "</h3>" +
-          '<span class="tag cat">' + esc(c.category) + " · " + esc(c.subcategory || "") + "</span>" + conf +
+          '<span class="tag cat">' + esc(c.category) + " · " + esc(c.subcategory || "") + "</span>" +
+          (c.category !== "小而美公司" && (c.tags || []).indexOf("小而美公司") >= 0
+            ? '<span class="tag sb">小而美公司</span>' : "") + conf +
         "</div>" +
         '<span class="status-pill ' + statusClass(st) + '">' + statusLabel(st) + "</span></div>" +
         '<div class="card-batches">' + (c.batches || []).map(batchLine).join("") + "</div>" +
         '<div class="card-meta">' + meta.join("") + "</div>" +
+        (extra ? '<div class="card-extra">' + extra + "</div>" : "") +
         '<div class="card-actions">' +
           '<button class="btn-star' + (isFav(c.id) ? " on" : "") + '" data-fav="' + esc(c.id) + '" title="' + (isFav(c.id) ? "取消收藏" : "收藏置顶") + '">★</button>' +
           '<button class="btn" data-detail="' + esc(c.id) + '">详情 / 要求</button>' +
@@ -246,6 +400,10 @@
     if (!c) return;
     var st = companyStatus(c);
     function row(k, v) { return v ? "<dt>" + k + "</dt><dd>" + esc(v) + "</dd>" : ""; }
+    // 没有内容的区块直接不渲染，避免详情页出现「空标题 + 什么都不显示」
+    function sec(title, body) {
+      return body ? '<div class="detail-section"><h4>' + title + '</h4><dl class="detail-grid">' + body + "</dl></div>" : "";
+    }
     $("#modalBody").innerHTML =
       '<button class="modal-close" id="modalClose">✕</button>' +
       "<h2>" + esc(c.name) + "</h2>" +
@@ -253,16 +411,12 @@
       '<span class="status-pill ' + statusClass(st) + '">' + statusLabel(st) + "</span>" +
       '<div class="detail-section"><h4>📅 网申批次（往年时间）</h4>' +
         '<div class="card-batches">' + (c.batches || []).map(batchLine).join("") + "</div></div>" +
-      '<div class="detail-section"><h4>🎓 用人要求</h4><dl class="detail-grid">' +
-        row("学历要求", c.degree) + row("专业方向", c.major) + row("证书", c.certs) +
-        row("技能", c.skills) + row("英语", c.english) +
-      "</dl></div>" +
-      '<div class="detail-section"><h4>📝 考核流程</h4><dl class="detail-grid">' +
-        row("笔试", c.writtenTest) + row("面试", c.interviews) +
-      "</dl></div>" +
-      '<div class="detail-section"><h4>💰 待遇与留用</h4><dl class="detail-grid">' +
-        row("薪资", c.salary) + row("食宿", c.housing) + row("留用", c.retention) +
-      "</dl></div>" +
+      sec("🧭 机构信息", row("主营业务", c.biz) + row("适合投递方向", c.jobs) +
+        row("规模量级", c.scale ? "≈ " + c.scale + "（按公开信息粗判，非精确人数）" : "") + row("备注", c.note)) +
+      sec("🎓 用人要求", row("学历要求", c.degree) + row("专业方向", c.major) + row("证书", c.certs) +
+        row("技能", c.skills) + row("英语", c.english)) +
+      sec("📝 考核流程", row("笔试", c.writtenTest) + row("面试", c.interviews)) +
+      sec("💰 待遇与留用", row("薪资", c.salary) + row("食宿", c.housing) + row("留用", c.retention)) +
       '<div class="detail-section"><h4>📨 投递与内推渠道</h4><dl class="detail-grid">' +
         row("官方渠道", c.referral) + (c.applyLink ? '<dt>网申链接</dt><dd><a href="' + esc(c.applyLink) + '" target="_blank" rel="noopener">' + esc(c.applyLink) + "</a></dd>" : "") +
         row("城市", (c.cities || []).join(" / ")) +
@@ -280,7 +434,7 @@
   function pct(d) { return Math.max(0, Math.min(100, ((d - TL_START) / TL_SPAN) * 100)); }
   function renderTimeline() {
     var cat = $("#timelineCategory").value;
-    var list = DATA.companies.filter(function (c) { return !cat || c.category === cat; });
+    var list = DATA.companies.filter(function (c) { return !cat || inCat(c, cat); });
     list = list.filter(function (c) { return companyWindows(c).length > 0; });
     var months = [];
     for (var m = new Date(2026, 8, 1); m <= TL_END; m.setMonth(m.getMonth() + 1)) {
@@ -319,12 +473,15 @@
       '<div class="stat-box"><b>' + stats.interview + "</b><span>已面试</span></div>" +
       '<div class="stat-box"><b>' + stats.offer + "</b><span>已Offer</span></div>";
     var cats = [];
-    DATA.companies.forEach(function (c) { if (cats.indexOf(c.category) < 0) cats.push(c.category); });
+    DATA.companies.forEach(function (c) {
+      if (cats.indexOf(c.category) < 0) cats.push(c.category);
+      (c.tags || []).forEach(function (t) { if (cats.indexOf(t) < 0) cats.push(t); });
+    });
     $("#kanban").innerHTML = STAGES.map(function (s) {
       var cat = kanbanCat[s.key] || "";
       var items = DATA.companies.filter(function (c) {
         if ((progress[c.id] ? progress[c.id].stage : "none") !== s.key) return false;
-        if (cat && c.category !== cat) return false;
+        if (cat && !inCat(c, cat)) return false;
         return true;
       });
       var opts = '<option value="">全部类型</option>' + cats.map(function (x) {
@@ -490,7 +647,7 @@
     $("#todayText").textContent = "今天是 " + now.getFullYear() + " 年 " + (now.getMonth() + 1) + " 月 " + now.getDate() + " 日";
     $("#updatedAt").textContent = DATA.updatedAt || "整理中";
     // 数据行补 id
-    DATA.companies.forEach(function (c, i) { if (!c.id) c.id = "c" + i; });
+    DATA.companies.forEach(function (c, i) { if (!c.id) c.id = "c" + i; applyDefaults(c); });
     try { kanbanCat = JSON.parse(localStorage.getItem(LS_KEY + "_kanbanCat")) || {}; } catch (e) { kanbanCat = {}; }
     renderCategories();
     renderAlert();
