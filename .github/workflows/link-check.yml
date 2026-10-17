@@ -1,0 +1,60 @@
+# 每日官网链接巡检
+#
+# 干什么：把 js/data.enc.js 里 542 条官网直链逐条请求一遍，
+#         把「连续 3 天都连不上」的写进 js/link-status.json 并自动提交，
+#         网页端会在对应公司卡片上显示「⚠️ 链接可能失效」。
+#
+# 成本：公开仓库的 Actions 免费；纯 Node HTTP 请求，**不用任何 AI / API token**。
+#
+# 首次配置（一次性）：
+#   仓库 Settings → Secrets and variables → Actions → New repository secret
+#     SITE_USER = 站点登录账号
+#     SITE_PASS = 站点登录密码
+#   （只用于在 CI 里解开密文拿到链接清单；Secrets 加密存储，日志里不可见。
+#     不配置的话本工作流会安静跳过，不会每天报错。）
+#
+# 注意：GitHub 的 runner 在境外，个别只对国内开放/仅支持浏览器访问的站点可能误报；
+#       脚本用「连续 3 天失败才提示 + 失败原因写进结果文件」来压误报，
+#       偶发 1–2 天的失败只会记为 warn，不会打扰页面。
+
+name: link-check
+
+on:
+  schedule:
+    - cron: "30 2 * * *"        # UTC 02:30 = 北京时间 10:30（Actions 的定时可能有几分钟到半小时延迟）
+  workflow_dispatch: {}         # 允许在 Actions 页面手动触发
+
+permissions:
+  contents: write               # 需要提交 js/link-status.json
+
+concurrency:
+  group: link-check
+  cancel-in-progress: false     # 上一次没跑完就等它，避免互相覆盖
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: 巡检官网直链
+        env:
+          SITE_USER: ${{ secrets.SITE_USER }}
+          SITE_PASS: ${{ secrets.SITE_PASS }}
+        run: node tools/ci-check-links.js
+
+      - name: 有变化才提交
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add js/link-status.json
+          if git diff --cached --quiet; then
+            echo "巡检结果无变化，无需提交"
+          else
+            git commit -m "chore: 每日官网链接巡检结果更新"
+            git push
+          fi

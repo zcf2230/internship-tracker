@@ -1,0 +1,29 @@
+{
+ "checkedAt": "2026-10-17T05:14:12.004Z",
+ "summary": {
+  "total": 542,
+  "ok": 539,
+  "warn": 3,
+  "bad": 0
+ },
+ "entries": {
+  "dachang-20": {
+   "s": "warn",
+   "f": 1,
+   "first": "2026-10-17",
+   "why": "ECONNRESET"
+  },
+  "brokers2-0": {
+   "s": "warn",
+   "f": 1,
+   "first": "2026-10-17",
+   "why": "ECONNRESET"
+  },
+  "big4-12": {
+   "s": "warn",
+   "f": 1,
+   "first": "2026-10-17",
+   "why": "超时"
+  }
+ }
+}

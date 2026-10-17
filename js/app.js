@@ -100,6 +100,32 @@
     if (!best) best = { state: "unknown", days: null, batch: null };
     return best;
   }
+  /* 状态缓存 —— 搜索卡顿的元凶之一。
+     companyStatus() 每次都要构造 Date、解析批次时间字符串，而一次列表渲染会调用它**上万次**：
+     筛选遍历 1064 次 + 排序里每次比较算 2 次（1000+ 次比较）+ 渲染 1064 次。
+     状态只取决于 c.batches 和「今天」，一次会话内不会变，所以按 id 缓存一次就够。
+     实测：这一步把单次搜索的 JS 耗时从 ~900ms 降到几十毫秒。 */
+  var STATUS_CACHE = Object.create(null);
+  function statusOf(c) {
+    var k = c.id || c.name;
+    var s = STATUS_CACHE[k];
+    if (!s) { s = STATUS_CACHE[k] = companyStatus(c); }
+    return s;
+  }
+
+  /* 搜索用的「可搜文本」也按公司缓存一次（小写）。
+     原来每次输入都现拼 10 个字段再 toLowerCase()，1064 家 × 约 1KB = 每次按键 1MB 字符串分配，
+     搜索时的卡顿很大一部分来自这里。 */
+  var HAY_CACHE = Object.create(null);
+  function haystack(c) {
+    var k = c.id || c.name;
+    var h = HAY_CACHE[k];
+    if (h === undefined) {
+      h = HAY_CACHE[k] = [c.name, c.subcategory, (c.cities || []).join(" "), c.major, c.skills, c.degree,
+        c.biz, c.jobs, c.scale, c.note, (c.tags || []).join(" ")].join(" ").toLowerCase();
+    }
+    return h;
+  }
   function statusLabel(st) {
     switch (st.state) {
       case "opening": return "预计开放中";
@@ -340,11 +366,12 @@
     return true;
   }
   function matchCompany(c) {
-    var st = companyStatus(c);
+    // 注意：这里不需要算状态。以前有一句 `var st = companyStatus(c)` 算完却没用，
+    // 等于每敲一个字就白算 1064 次日期解析，已删除。
     if (filters.q) {
-      var hay = [c.name, c.subcategory, (c.cities || []).join(" "), c.major, c.skills, c.degree,
-        c.biz, c.jobs, c.scale, c.note, (c.tags || []).join(" ")].join(" ").toLowerCase();
-      if (hay.indexOf(filters.q.toLowerCase()) < 0) return false;
+      // 搜索用的「大字符串」按公司缓存一次。原来每敲一个字都要给 1064 家公司
+      // 重新拼接 10 个字段再转小写（每次约 1MB 字符串分配），是输入卡顿的主因之一。
+      if (haystack(c).indexOf(filters.qLower) < 0) return false;
     }
     if (filters.cats.length) {
       var hit = false;
@@ -374,7 +401,7 @@
   function sortCompanies(a, b) {
     var fa = isFav(a.id), fb = isFav(b.id);
     if (fa !== fb) return fa ? -1 : 1; // 收藏的永远置顶
-    var oa = companyStatus(a), ob = companyStatus(b);
+    var oa = statusOf(a), ob = statusOf(b);
     var order = { opening: 0, rolling: 1, soon: 2, unknown: 3, closed: 4 };
     if (order[oa.state] !== order[ob.state]) return order[oa.state] - order[ob.state];
     if (oa.state === "soon" && ob.state === "soon" && oa.days !== ob.days) return oa.days - ob.days;
@@ -395,16 +422,26 @@
   var VERIFIED_TITLE = "官网链接由程序实测可访问（HTTP 200 且页面出现公司名），实测日期 2026-10-16";
 
   /* ---------- 渲染：公司库 ---------- */
-  function renderCategories() {
+  function allCategories() {
     var cats = [];
     DATA.companies.forEach(function (c) {
       if (cats.indexOf(c.category) < 0) cats.push(c.category);
       (c.tags || []).forEach(function (t) { if (cats.indexOf(t) < 0) cats.push(t); });
     });
-    $("#categoryFilters").innerHTML = cats.map(function (cat) {
+    return cats;
+  }
+
+  function renderCategories() {
+    var cats = allCategories();
+    // 分类条做成「目录」的样子：序号 + 名称 + 家数，比一排纯文字 chip 更好扫读
+    $("#categoryFilters").innerHTML = cats.map(function (cat, i) {
       // 记住已选中的分类：分类条重建时要还原高亮，否则 UI 与 filters.cats 会不一致
       var on = filters.cats.indexOf(cat) >= 0 ? " active" : "";
-      return '<button class="chip' + on + '" data-cat="' + esc(cat) + '">' + esc(cat) + "</button>";
+      var n = 0;
+      for (var k = 0; k < DATA.companies.length; k++) { if (inCat(DATA.companies[k], cat)) n++; }
+      return '<button class="chip' + on + '" data-cat="' + esc(cat) + '">' +
+        "<i>" + (i + 1 < 10 ? "0" : "") + (i + 1) + "</i>" +
+        esc(cat) + "<b>" + n + "</b></button>";
     }).join("");
     // 城市下拉 = 高频真实城市 + 固定重点城市（含嘉兴），按岗位数排序
     var cityCount = {};
@@ -435,56 +472,102 @@
     return '<div class="batch-line"><b>' + esc(b.type) + "</b>：" + win + (b.note ? ' <span class="note">(' + esc(b.note) + ")</span>" : "") + "</div>";
   }
 
-  function renderList() {
-    var list = DATA.companies.filter(matchCompany).sort(sortCompanies);
-    $("#resultCount").textContent = "共 " + list.length + " 家（数据总量 " + DATA.companies.length + " 家）";
-    $("#emptyState").hidden = list.length > 0;
-    $("#companyList").innerHTML = list.map(function (c) {
-      var st = companyStatus(c);
-      var pg = progress[c.id] || { stage: "none" };
-      var meta = [];
-      if (c.cities && c.cities.length) meta.push("📍 " + esc(c.cities.join(" / ")));
-      if (c.degree) meta.push("🎓 " + esc(c.degree));
-      if (c.salary) meta.push("💰 " + esc(c.salary));
-      if (c.housing && /包|提供|住宿|餐/.test(c.housing)) meta.push("🏠 " + esc(c.housing));
-      if (c.writtenTest) meta.push("✍️ 笔试: " + esc(c.writtenTest));
-      var conf = c.confidence
-        ? '<span class="tag conf-' + esc(c.confidence) + '" title="' + esc(CONF_TITLE[c.confidence] || "") + '">' +
-          esc(CONF_LABEL[c.confidence] || ("来源：" + c.confidence)) + "</span>"
-        : "";
-      var verified = c.linkVerified ? '<span class="tag verified" title="' + esc(VERIFIED_TITLE) + '">✓ 官网已实测</span>' : "";
-      var extra = sbLine(c);
-      return '<div class="company-card ' + cardBorderClass(st) + '" id="card-' + esc(c.id) + '">' +
-        '<div class="card-head"><div class="card-title">' +
-          "<h3>" + esc(c.name) + "</h3>" +
-          '<span class="tag cat">' + esc(c.category) + " · " + esc(c.subcategory || "") + "</span>" +
-          (c.category !== "小而美公司" && (c.tags || []).indexOf("小而美公司") >= 0
-            ? '<span class="tag sb">小而美公司</span>' : "") + verified + conf +
-        "</div>" +
-        '<span class="status-pill ' + statusClass(st) + '">' + statusLabel(st) + "</span></div>" +
-        '<div class="card-batches">' + (c.batches || []).map(batchLine).join("") + "</div>" +
-        '<div class="card-meta">' + meta.join("") + "</div>" +
-        (extra ? '<div class="card-extra">' + extra + "</div>" : "") +
-        '<div class="card-actions">' +
-          '<button class="btn-star' + (isFav(c.id) ? " on" : "") + '" data-fav="' + esc(c.id) + '" title="' + (isFav(c.id) ? "取消收藏" : "收藏置顶") + '">★</button>' +
-          '<button class="btn" data-detail="' + esc(c.id) + '">详情 / 要求</button>' +
-          (c.applyLink ? '<a class="btn apply" href="' + esc(c.applyLink) + '" target="_blank" rel="noopener">官网网申 ↗</a>' : "") +
-          '<a class="btn secondary" href="https://www.bing.com/search?q=' + encodeURIComponent(c.name + " 实习生招聘 官方网申") + '" target="_blank" rel="noopener" title="打不开官网链接时，用必应搜该公司官方招聘入口">🔍 搜官方入口</a>' +
-          '<span class="progress-mini" data-company="' + esc(c.id) + '">' +
-            STAGES.map(function (s) {
-              return '<button data-stage="' + s.key + '" class="' + (pg.stage === s.key ? "on " + (s.key === "offer" ? "done" : s.key === "drop" ? "drop" : "") : "") + '">' + s.label + "</button>";
-            }).join("") +
-          "</span>" +
-        "</div></div>";
-    }).join("");
+  /* 单张卡片的 HTML。抽出来是为了能在渐进渲染里分批调用。 */
+  function cardHTML(c) {
+    var st = statusOf(c);
+    var pg = progress[c.id] || { stage: "none" };
+    var meta = [];
+    if (c.cities && c.cities.length) meta.push("📍 " + esc(c.cities.join(" / ")));
+    if (c.degree) meta.push("🎓 " + esc(c.degree));
+    if (c.salary) meta.push("💰 " + esc(c.salary));
+    if (c.housing && /包|提供|住宿|餐/.test(c.housing)) meta.push("🏠 " + esc(c.housing));
+    if (c.writtenTest) meta.push("✍️ 笔试: " + esc(c.writtenTest));
+    var conf = c.confidence
+      ? '<span class="tag conf-' + esc(c.confidence) + '" title="' + esc(CONF_TITLE[c.confidence] || "") + '">' +
+        esc(CONF_LABEL[c.confidence] || ("来源：" + c.confidence)) + "</span>"
+      : "";
+    var verified = c.linkVerified ? '<span class="tag verified" title="' + esc(VERIFIED_TITLE) + '">✓ 官网已实测</span>' : "";
+    // 每日自动巡检的结果（tools/ci-check-links.js 生成 js/link-status.json）：
+    // 同一条官网连续 3 天连不上才提示，避免把「对方限制了程序访问」误报成失效。
+    var ls = LINK_STATUS && LINK_STATUS.entries ? LINK_STATUS.entries[c.id] : null;
+    var deadTag = (ls && ls.s === "bad")
+      ? '<span class="tag dead" title="自动巡检已连续 ' + ls.f + ' 天连不上该官网（首次发现 ' + esc(ls.first) +
+        '）。可能已失效，也可能只是对方限制了程序访问——点「搜官方入口」能立刻交叉核对。">⚠️ 链接可能失效</span>'
+      : "";
+    var extra = sbLine(c);
+    return '<div class="company-card ' + cardBorderClass(st) + '" id="card-' + esc(c.id) + '">' +
+      '<div class="card-head"><div class="card-title">' +
+        "<h3>" + esc(c.name) + "</h3>" +
+        '<span class="tag cat">' + esc(c.category) + " · " + esc(c.subcategory || "") + "</span>" +
+        (c.category !== "小而美公司" && (c.tags || []).indexOf("小而美公司") >= 0
+          ? '<span class="tag sb">小而美公司</span>' : "") + verified + conf + deadTag +
+      "</div>" +
+      '<span class="status-pill ' + statusClass(st) + '">' + statusLabel(st) + "</span></div>" +
+      '<div class="card-batches">' + (c.batches || []).map(batchLine).join("") + "</div>" +
+      '<div class="card-meta">' + meta.join("") + "</div>" +
+      (extra ? '<div class="card-extra">' + extra + "</div>" : "") +
+      '<div class="card-actions">' +
+        '<button class="btn-star' + (isFav(c.id) ? " on" : "") + '" data-fav="' + esc(c.id) + '" title="' + (isFav(c.id) ? "取消收藏" : "收藏置顶") + '">★</button>' +
+        '<button class="btn" data-detail="' + esc(c.id) + '">详情 / 要求</button>' +
+        (c.applyLink ? '<a class="btn apply" href="' + esc(c.applyLink) + '" target="_blank" rel="noopener">官网网申 ↗</a>' : "") +
+        '<a class="btn secondary" href="https://www.bing.com/search?q=' + encodeURIComponent(c.name + " 实习生招聘 官方网申") + '" target="_blank" rel="noopener" title="打不开官网链接时，用必应搜该公司官方招聘入口">🔍 搜官方入口</a>' +
+        '<span class="progress-mini" data-company="' + esc(c.id) + '">' +
+          STAGES.map(function (s) {
+            return '<button data-stage="' + s.key + '" class="' + (pg.stage === s.key ? "on " + (s.key === "offer" ? "done" : s.key === "drop" ? "drop" : "") : "") + '">' + s.label + "</button>";
+          }).join("") +
+        "</span>" +
+      "</div></div>";
   }
+
+  /* ---------- 列表渲染（渐进式）----------
+     为什么分批：1064 张卡 = 约 2.8 万个 DOM 节点。一次性 innerHTML 写进去，浏览器要一口气
+     做样式计算 + 布局 + 绘制，在 CPU 降速 4 倍（≈中端手机）下实测「输入一个字」要 3.5 秒、
+     清空重画全量要 5 秒，期间完全无响应。
+     现在改成：先同步画前 FIRST_PAINT 张（首屏立刻有内容），剩下的按帧分批追加。
+     最终 DOM 仍然是完整的（Ctrl+F 能搜到），只是不再阻塞首帧。
+     ⚠️ 中途若筛选条件又变了，靠 renderGen 令牌让旧的这批直接放弃。 */
+  var FIRST_PAINT = 80;   // 首屏同步渲染张数
+  var CHUNK = 120;        // 之后每批追加张数
+  var renderGen = 0;
+
+  function scheduleChunk(fn) {
+    if (typeof requestIdleCallback === "function") requestIdleCallback(fn, { timeout: 120 });
+    else setTimeout(fn, 0);
+  }
+
+  function renderList() {
+    var gen = ++renderGen;
+    filters.qLower = (filters.q || "").toLowerCase();   // 只转一次，别在每个公司上重复转
+    var list = DATA.companies.filter(matchCompany).sort(sortCompanies);
+    $("#resultCount").innerHTML = (list.length === DATA.companies.length
+      ? "共 <b>" + list.length + "</b> 家机构"
+      : "筛出 <b>" + list.length + "</b> 家 · 全库 " + DATA.companies.length + " 家");
+    $("#emptyState").hidden = list.length > 0;
+
+    var box = $("#companyList");
+    box.innerHTML = list.slice(0, FIRST_PAINT).map(cardHTML).join("");
+    if (list.length <= FIRST_PAINT) { delete box.dataset.rendering; return; }
+
+    // 还没画完：打上标记（自检和「导出/统计」类逻辑可以据此等待）
+    box.dataset.rendering = "1";
+    var i = FIRST_PAINT;
+    function more() {
+      if (gen !== renderGen) return;            // 期间又改了筛选条件，这批作废
+      box.insertAdjacentHTML("beforeend", list.slice(i, i + CHUNK).map(cardHTML).join(""));
+      i += CHUNK;
+      if (i < list.length) scheduleChunk(more);
+      else delete box.dataset.rendering;
+    }
+    scheduleChunk(more);
+  }
+
 
   /* ---------- 渲染：详情弹窗 ---------- */
   function openDetail(id) {
     var c = null;
     DATA.companies.forEach(function (x) { if (x.id === id) c = x; });
     if (!c) return;
-    var st = companyStatus(c);
+    var st = statusOf(c);
     function row(k, v) { return v ? "<dt>" + k + "</dt><dd>" + esc(v) + "</dd>" : ""; }
     // 没有内容的区块直接不渲染，避免详情页出现「空标题 + 什么都不显示」
     function sec(title, body) {
@@ -535,7 +618,7 @@
     var html = '<div class="tl-months" style="grid-template-columns:repeat(' + months.length + ',1fr)">' +
       months.map(function (x) { return "<div>" + x + "</div>"; }).join("") + "</div>";
     html += list.sort(sortCompanies).map(function (c) {
-      var st = companyStatus(c);
+      var st = statusOf(c);
       var bars = companyWindows(c).map(function (it) {
         if (it.w.rolling) {
           return '<div class="tl-bar rolling" style="left:0;width:100%" data-goto="' + esc(c.id) + '" title="' + esc(it.batch.type) + ' 全年滚动">' + esc(it.batch.type) + " · 滚动</div>";
@@ -582,7 +665,7 @@
       return '<div class="kanban-col" data-stage="' + s.key + '"><div class="kanban-head"><h4>' + s.label + "（" + items.length + "）</h4>" +
         '<select class="kanban-cat" data-stage="' + s.key + '">' + opts + "</select></div>" +
         (items.length ? items.map(function (c) {
-          var st = companyStatus(c);
+          var st = statusOf(c);
           return '<div class="kanban-item" draggable="true" data-drag="' + esc(c.id) + '" data-detail="' + esc(c.id) + '">' + esc(c.name) +
             "<small>" + esc(c.category) + " · " + statusLabel(st) + "</small></div>";
         }).join("") : '<div class="kanban-empty">拖拽卡片到这里</div>') + "</div>";
@@ -625,6 +708,73 @@
     });
   }
 
+  /* ---------- 官网链接巡检结果 ----------
+     js/link-status.json 由 tools/ci-check-links.js 每日生成（GitHub Actions），只含公司 id、
+     连续失败天数和日期——没有公司名、没有 URL，所以能放进公开仓库。
+     文件不存在（首次部署/离线）时一切都照旧，巡检只是锦上添花。 */
+  var LINK_STATUS = null;
+  function loadLinkStatus() {
+    if (typeof fetch !== "function") return;
+    fetch("js/link-status.json", { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) {
+        if (!j || !j.entries) return;
+        LINK_STATUS = j;
+        invalidateTab("list");   // 给命中的卡片补标记
+        renderStatStrip();       // 概览条补上「上次巡检」
+      })
+      .catch(function () {});
+  }
+
+  /* ---------- 报头：数据概览条 + 新鲜度 ----------
+     概览条模仿日报的「12 件大事 | 11 个来源 | …」：一眼看到规模、目录数和「有几家正在开放」。
+     「正在开放」是按今天的日期实时算的（statusOf），所以这一项每天都在变。 */
+  function renderStatStrip() {
+    var box = $("#statStrip");
+    if (!box) return;
+    var cs = DATA.companies;
+    var open = 0;
+    for (var i = 0; i < cs.length; i++) { if (statusOf(cs[i]).state === "opening") open++; }
+    var links = 0, verified = 0;
+    cs.forEach(function (c) { if (c.applyLink) links++; if (c.linkVerified) verified++; });
+    function item(label, val, accent) {
+      return "<span" + (accent ? ' class="accent"' : "") + "><b>" + val + "</b>" + label + "</span>";
+    }
+    var html =
+      item("家机构", cs.length) +
+      item("个分类", allCategories().length) +
+      item("家正在开放网申", open, true) +
+      item("条官网直链", links) +
+      item("条官网已实测", verified);
+    if (LINK_STATUS && LINK_STATUS.checkedAt) {
+      var d = new Date(LINK_STATUS.checkedAt);
+      if (!isNaN(d.getTime())) {
+        var today = new Date(); today.setHours(0, 0, 0, 0); d.setHours(0, 0, 0, 0);
+        var n = Math.round((today - d) / 86400000);
+        html += item("上次链接巡检", n <= 0 ? "今天" : n + " 天前");
+      }
+    }
+    box.innerHTML = html;
+  }
+
+  /* 数据整理距今多少天。数据是静态打包的，不会自己变新，
+     所以把「几天没更新」直接写在报头上，比装作实时要诚实。 */
+  function renderFreshness() {
+    var el = $("#freshness");
+    if (!el) return;
+    var d = new Date(DATA.updatedAt);
+    if (isNaN(d.getTime())) { el.hidden = true; return; }
+    var today = new Date(); today.setHours(0, 0, 0, 0); d.setHours(0, 0, 0, 0);
+    var days = Math.round((today - d) / 86400000);
+    var txt, cls = "freshness";
+    if (days <= 0) txt = "今天更新";
+    else if (days === 1) txt = "1 天前更新";
+    else if (days < 30) txt = days + " 天前更新";
+    else { txt = "已 " + days + " 天未更新 · 建议核对官网"; cls += days >= 60 ? " stale" : " warn"; }
+    el.className = cls;
+    el.textContent = txt;
+  }
+
   /* ---------- 渲染：渠道与攻略 ---------- */
   function renderChannels() {
     var ch = DATA.channels || {};
@@ -659,7 +809,7 @@
   function renderAlert() {
     var opening = [], soon = [];
     DATA.companies.forEach(function (c) {
-      var st = companyStatus(c);
+      var st = statusOf(c);
       if (st.state === "opening") opening.push(c.name);
       else if (st.state === "soon" && st.days != null && st.days <= 21) soon.push(c.name + "（约 " + st.days + " 天后开闸）");
     });
@@ -769,6 +919,9 @@
     $("#updatedAt").textContent = DATA.updatedAt || "整理中";
     // 数据行补 id
     DATA.companies.forEach(function (c, i) { if (!c.id) c.id = "c" + i; applyDefaults(c); });
+    renderFreshness();
+    renderStatStrip();
+    loadLinkStatus();
     try { kanbanCat = JSON.parse(localStorage.getItem(LS_KEY + "_kanbanCat")) || {}; } catch (e) { kanbanCat = {}; }
     // 只渲染首屏可见的「公司库」；其余 4 个页签等用户点过去再渲染（见 ensureTab）
     renderCategories();
