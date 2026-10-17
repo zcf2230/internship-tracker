@@ -104,6 +104,22 @@ AES-GCM 的密文是伪随机的、**完全不可压缩**，所以顺序错一�
 滚动时位置会跳。本项目实测桌面平均 234px、手机 446px（要减掉 32px 内边距填「内容盒」高度），
 校准后高度偏差从 55% 降到 5%。改了卡片内边距/字号后要重新校准这两个值。
 
+### 桌面版（desktop/，双击即用，不开浏览器）
+
+`desktop/` 是一个 Electron 外壳：站点文件原样打包，双击图标以独立窗口打开，不用浏览器。
+
+```bash
+node tools/build-desktop.js           # 同步站点文件到 desktop/app/
+node tools/build-desktop.js --build   # 同步并打包 → desktop/dist/（nsis 安装包 + portable 免安装 exe）
+```
+
+- 打包复用「金融考研择校通」工程的 electron 33 + electron-builder 25（`KAOYAN` 常量指定路径），本仓库不装 node_modules
+- 自定义 `app://` 协议把站点当**安全源**提供（`fetch` 与 `crypto.subtle` 在 file:// 下不可用）
+- **数据自动保鲜**：启动约 4 秒后后台对比线上密文（和网页版同一地址），有新版就校验（体积/结构）
+  后原子写入用户目录 `data-cache.enc.js` 并静默刷新；离线或校验失败一律继续用内置数据
+- 安全模型与网页版一致：数据仍是密文，每次打开需要输一次解锁口令
+- 渲染进程 `sandbox + contextIsolation`，无 Node 能力；已禁用硬件加速（列表应用不需要，规避显卡兼容问题）
+
 ### 每日官网链接巡检（tools/ci-check-links.js）
 
 **先回答成本：完全免费，全程 0 个 AI / API token。**

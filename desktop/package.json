@@ -1,0 +1,31 @@
+{
+  "name": "internship-tracker-app",
+  "version": "1.0.0",
+  "description": "金融实习网申通 桌面版",
+  "main": "main.js",
+  "author": "zcf2230",
+  "private": true,
+  "build": {
+    "appId": "com.zcf.internship",
+    "productName": "金融实习网申通",
+    "electronVersion": "33.4.11",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "app/**/*"
+    ],
+    "win": {
+      "target": ["nsis", "portable"],
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    },
+    "compression": "normal"
+  }
+}

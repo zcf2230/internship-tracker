@@ -13,3 +13,6 @@ tools/link-candidates-*.txt
 tools/link-verify-report.txt
 tools/link-manual.txt
 tools/link-verify-render-report.txt
+# 桌面版：构建产物与同步副本不进仓库（tools/build-desktop.js 会重新生成）
+desktop/dist/
+desktop/app/
