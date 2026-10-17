@@ -10,7 +10,7 @@
  * 安全边界与网页版一致：数据仍是密文，解锁口令只在你本机派生密钥；
  * 渲染进程 sandbox + contextIsolation，拿不到 Node 能力。
  */
-const { app, BrowserWindow, Menu, protocol, net } = require('electron');
+const { app, BrowserWindow, Menu, protocol, net, session, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const https = require('https');
@@ -28,14 +28,31 @@ const MIME = {
   '.ico': 'image/x-icon'
 };
 
-const log = (...a) => { try { console.log('[desktop]', ...a); } catch (e) {} };
+/* 日志同时写文件：打包版是 GUI 子系统，从终端看不到 stdout，
+ * 出问题时让用户把 %APPDATA%/金融实习网申通/desktop.log 发来即可定位 */
+function log(...a) {
+  const s = '[desktop] ' + a.map(x => (typeof x === 'string' ? x : JSON.stringify(x))).join(' ');
+  try { console.log(s); } catch (e) {}
+  try { fs.appendFileSync(path.join(app.getPath('userData'), 'desktop.log'), new Date().toISOString() + ' ' + s + '\n'); } catch (e) {}
+}
 
 // 列表类应用用不到 GPU 加速；禁掉可避开各类显卡/远程桌面环境下的渲染崩溃
 app.disableHardwareAcceleration();
 
+/* 免安装版（portable）默认把数据写进随机的临时目录，重启就丢——
+ * 这里把数据目录固定到 exe 旁边的 Data\ 文件夹：
+ * 收藏、投递进度、主题选择、数据保鲜缓存都跟着 exe 走，换电脑也不丢。 */
+if (process.env.PORTABLE_EXECUTABLE_DIR) {
+  try {
+    const dataDir = path.join(process.env.PORTABLE_EXECUTABLE_DIR, 'Data');
+    fs.mkdirSync(dataDir, { recursive: true });
+    app.setPath('userData', dataDir);
+  } catch (e) {}
+}
+
 /* app:// 协议：把 app/ 目录映射成 https 风格的安全源 */
-function registerAppProtocol() {
-  protocol.handle('app', (request) => {
+function makeHandler() {
+  return (request) => {
     try {
       const u = new URL(request.url);
       let p = decodeURIComponent(u.pathname).replace(/^\/+/, '') || 'index.html';
@@ -51,9 +68,20 @@ function registerAppProtocol() {
         headers: { 'Content-Type': MIME[path.extname(file).toLowerCase()] || 'application/octet-stream' }
       });
     } catch (e) {
+      log('app:// 取文件失败', request.url, String(e.message).slice(0, 80));
       return new Response('not found', { status: 404 });
     }
-  });
+  };
+}
+
+function registerAppProtocol() {
+  const handler = makeHandler();
+  /* ⚠️ 协议处理器是按「会话（session）」注册的：protocol.handle 只覆盖默认会话，
+   * 而窗口用的是 partition 'persist:itr'（为了持久化收藏/主题）——
+   * 必须在**那个会话**上也注册，否则窗口加载 app:// 时找不到处理器，
+   * Electron 会把它当外部链接丢给 Windows，弹「没有可打开此 app 链接的应用」。 */
+  protocol.handle('app', handler);
+  session.fromPartition('persist:itr').protocol.handle('app', handler);
 }
 
 /* 当前实际服务的密文文本（缓存优先，回退内置） */
@@ -101,6 +129,18 @@ function createWindow() {
   });
   win.webContents.on('did-fail-load', (e, code, desc, url) => log('加载失败', code, desc, url));
   win.webContents.on('render-process-gone', (e, d) => log('渲染进程退出', JSON.stringify(d).slice(0, 120)));
+  /* 页面里「官网网申 ↗」「搜官方入口」都是 target=_blank 的 https 外链：
+   * 统一交给系统默认浏览器开，不让应用里冒出第二个窗口；
+   * 同时拦下所有离开 app:// 的导航（双保险，防止再出现把 app:// 交给系统的情况）。 */
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    if (/^https?:\/\//i.test(url)) shell.openExternal(url);
+    return { action: 'deny' };
+  });
+  win.webContents.on('will-navigate', (e, url) => {
+    if (url.startsWith('app://')) return;
+    e.preventDefault();
+    if (/^https?:\/\//i.test(url)) shell.openExternal(url);
+  });
   win.loadURL('app://bundle/index.html');
   win.webContents.on('did-finish-load', () => {
     log('页面加载完成');
