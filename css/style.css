@@ -5,6 +5,7 @@
    ⚠️ 类名与 HTML/JS 完全对应，改版只动视觉，不动结构语义。
    ============================================================ */
 :root {
+  color-scheme: light;
   /* —— 底色与文字：暖纸感，不用纯白也不用冷灰 —— */
   --bg: #faf8f5;
   --card: #ffffff;
@@ -63,6 +64,17 @@ button { font-family: inherit; cursor: pointer; }
   text-transform: uppercase; margin-top: 6px;
 }
 .header-meta { text-align: right; font-size: 12.5px; color: var(--ink-3); line-height: 1.9; }
+/* 主题三档开关：浅色 / 深色 / 随系统，选择存在 localStorage（key: itr_theme） */
+.theme-switch {
+  display: inline-flex; gap: 2px; background: var(--gray-soft);
+  border: 1px solid var(--line); border-radius: 999px; padding: 3px; margin-bottom: 10px;
+}
+.theme-switch button {
+  border: none; background: none; padding: 4px 13px; border-radius: 999px;
+  font-size: 12px; color: var(--ink-2); transition: background .15s, color .15s;
+}
+.theme-switch button:hover { color: var(--ink); }
+.theme-switch button.on { background: var(--card); color: var(--ink); font-weight: 600; box-shadow: var(--shadow); }
 .header-meta span { display: block; }
 .today { font-size: 13.5px; font-weight: 700; color: var(--ink); }
 .updated b { color: var(--ink-2); font-weight: 600; }
@@ -120,6 +132,12 @@ button { font-family: inherit; cursor: pointer; }
 #searchBox:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(23, 107, 117, .1); }
 
 .filter-group { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 12px; }
+/* 手机端「展开分类与筛选」开关：默认隐藏，≤640px 显示并收起分类/筛选行 */
+.filter-toggle {
+  display: none; width: 100%; align-items: center; justify-content: center; gap: 6px;
+  border: 1px dashed var(--line); background: none; border-radius: 999px;
+  padding: 9px 14px; font-size: 13px; color: var(--ink-2); margin-bottom: 12px;
+}
 /* 分类 chip：带「序号 + 家数」，像期刊目录 */
 .chip {
   display: inline-flex; align-items: center; gap: 6px;
@@ -391,6 +409,9 @@ button { font-family: inherit; cursor: pointer; }
 
 @media (max-width: 640px) {
   body { font-size: 14px; }
+  .filter-toggle { display: flex; }
+  .filter-panel:not(.open) .filter-group,
+  .filter-panel:not(.open) .filter-row { display: none; }
   .container { padding: 0 16px; }
   .site-header { padding-top: 20px; }
   .brand h1 { font-size: 26px; letter-spacing: -.5px; }
@@ -409,3 +430,45 @@ button { font-family: inherit; cursor: pointer; }
   .tag.cat { white-space: normal; }
   .legend > span { flex-direction: column; gap: 2px; }
 }
+
+/* ============================================================
+   深色模式：由 js/app.js 依据「浅色 / 深色 / 随系统」三档开关设置
+   <html data-theme="dark|light">，CSS 只认 data-theme，不依赖系统媒体查询
+   （「随系统」由 JS 监听系统主题变化后代为切换）。
+   ============================================================ */
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #191b1d;
+  --card: #222527;
+  --ink: #e7e4df;
+  --ink-2: #a9afb2;
+  --ink-3: #7e8589;
+  --line: #33383a;
+  --line-2: #292d2f;
+  --gray-soft: #2a2e30;
+  /* 强调色在深底上提亮一档，软底色改成深色色调 */
+  --blue: #4fb3bd;
+  --blue-soft: #123338;
+  --gold: #d9a441;
+  --gold-soft: #37301c;
+  --red: #e0705a;
+  --red-soft: #3a211b;
+  --green: #4caf7d;
+  --green-soft: #17301f;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .35);
+  --shadow-lg: 0 18px 50px rgba(0, 0, 0, .55);
+}
+
+/* 浅色态里「深底白字」的组件，深色下 --ink 变亮了，文字要跟着翻成深色 */
+html[data-theme="dark"] .tab.active { color: var(--bg); }
+html[data-theme="dark"] .chip.active { color: #10282b; }
+html[data-theme="dark"] .chip.active i,
+html[data-theme="dark"] .chip.active b { color: rgba(16, 40, 43, .65); }
+html[data-theme="dark"] .btn.apply:hover { color: #10282b; }
+html[data-theme="dark"] .progress-mini button.on { color: #10282b; }
+html[data-theme="dark"] .progress-mini button.on.done { color: #0f2b1b; }
+html[data-theme="dark"] .progress-mini button.on.drop { color: var(--bg); }
+html[data-theme="dark"] #loginBtn { color: var(--bg); }
+/* 提示条：浅色态的深棕文字在深底上看不清，统一用金色变量 */
+html[data-theme="dark"] .alert-bar,
+html[data-theme="dark"] .alert-bar b { color: var(--gold); }

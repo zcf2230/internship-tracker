@@ -5,7 +5,7 @@
  *
  * 读 tools/link-candidates-*.txt（公司名 | 页面关键词 | 候选域名…）
  * 逐个实测：HTTP 可达（200）**且**页面正文含关键词，才算通过；一个候选都没通过就不收录。
- * 产出 tools/links.json = { 公司名: 官网地址 }，由 tools/build-data.js 合并进数据。
+ * 产出 tools/links.json = { verifiedAt: 实测日期, links: { 公司名: 官网地址 } }，由 tools/build-data.js 合并进数据。
  *
  * 为什么要"页面含关键词"这一条：域名很好猜，但猜错会指到同名或蹭名的站点。
  * 只认「能打开 + 确实出现公司名」的，宁可少收也不收错。
@@ -98,7 +98,9 @@ const FORCE = process.argv.indexOf("--force") >= 0;
 (async () => {
   const all = readCandidates();
   // 增量：已在 links.json 里的不再重复实测（要全量重测加 --force）
-  const done = fs.existsSync(OUT) ? JSON.parse(fs.readFileSync(OUT, "utf8")) : {};
+  // links.json 是 {verifiedAt, links} 包装格式（旧版是无包装的纯映射，这里做兼容）
+  const rawLinks = fs.existsSync(OUT) ? JSON.parse(fs.readFileSync(OUT, "utf8")) : {};
+  const done = rawLinks.links || rawLinks;
   const items = FORCE ? all : all.filter(x => !done[x.name]);
   console.log("候选公司 " + all.length + " 家，本次需实测 " + items.length + " 家（已缓存 " + (all.length - items.length) + " 家）…\n");
   let i = 0;
@@ -145,7 +147,8 @@ const FORCE = process.argv.indexOf("--force") >= 0;
   // 合并而不是覆盖：保住上一轮/渲染复验已确认的结果
   const map = Object.assign({}, done);
   ok.forEach(x => { map[x.it.name] = x.r.url; });
-  fs.writeFileSync(OUT, JSON.stringify(map, null, 1), "utf8");
+  // verifiedAt = 最近一次实测日期，build-data 会把它写进数据，页面上的「官网已实测」标记用它
+  fs.writeFileSync(OUT, JSON.stringify({ verifiedAt: new Date().toISOString().slice(0, 10), links: map }, null, 1), "utf8");
   fs.writeFileSync(REPORT, lines.sort().join("\n"), "utf8");
 
   const byCat = {};

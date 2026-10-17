@@ -122,11 +122,13 @@ companies.forEach(c => {
 /* ⭐ 官网直链：tools/links.json（由 tools/verify-links.js 实测产生：能访问 200 且页面含公司名）
  * 优先级高于原始数据里的 applyLink —— 既用来「补」原来没链接的机构，也用来「修」失效的旧链接。
  * links.json 是明文（含公司名），按本站约定不进仓库，已在 .gitignore。 */
-const LINK_OVERRIDES = (() => {
+const LINK_RAW = (() => {
   const p = path.join(__dirname, "links.json");
   if (!fs.existsSync(p)) return {};
   try { return JSON.parse(fs.readFileSync(p, "utf8")); } catch (e) { console.error("links.json 解析失败，忽略：", e.message); return {}; }
 })();
+const LINK_OVERRIDES = LINK_RAW.links || LINK_RAW;   // 兼容旧版无包装格式
+const LINK_VERIFIED_AT = (LINK_RAW.verifiedAt || "").slice(0, 10);
 let linkAdded = 0, linkFixed = 0;
 companies.forEach(c => {
   const u = LINK_OVERRIDES[c.name];
@@ -151,7 +153,12 @@ if (fs.existsSync(chFile)) {
 const guidesFile = path.join(RAW, "guides.json");
 if (fs.existsSync(guidesFile)) guides = JSON.parse(fs.readFileSync(guidesFile, "utf8"));
 
-const data = { updatedAt: "2026-10-16", companies, channels, guides };
+const data = {
+  updatedAt: "2026-10-16",
+  // 官网直链最近一次实测日期（tools/verify-links.js 写在 links.json 里），页面标记用它
+  verifiedAt: LINK_VERIFIED_AT || null,
+  companies, channels, guides
+};
 const js = JSON.stringify(data, null, 1);
 fs.writeFileSync(OUT, js, "utf8");
 const sb = companies.filter(c => c.category === SB_CAT || c.tags.indexOf(SB_CAT) >= 0).length;

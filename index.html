@@ -3,10 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
 <title>金融实习网申通 · 2027 寒假实习</title>
 <meta name="description" content="各大券商、基金、银行、四大、咨询、大厂实习生招聘网申时间、用人要求、笔试提醒一站式查询">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
-<link rel="stylesheet" href="css/style.css?v=11">
+<script>
+/* 在样式表生效前把主题定好，避免深色用户看到一闪而过的白屏（FOUC） */
+try {
+  var __t = localStorage.getItem("itr_theme") || "light";
+  if (__t === "auto") __t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  if (__t !== "light" && __t !== "dark") __t = "light";
+  document.documentElement.dataset.theme = __t;
+} catch (e) {}
+</script>
+<link rel="stylesheet" href="css/style.css?v=13">
 </head>
 <body>
 
@@ -19,6 +29,11 @@
         <p class="subtitle">Finance Internship Tracker · 2027 寒假实习</p>
       </div>
       <div class="header-meta">
+        <div class="theme-switch" id="themeSwitch" role="group" aria-label="界面主题">
+          <button type="button" data-tv="light">浅色</button>
+          <button type="button" data-tv="dark">深色</button>
+          <button type="button" data-tv="auto" title="跟随电脑 / 手机的系统主题">随系统</button>
+        </div>
         <span class="today" id="todayText"></span>
         <span class="updated">数据整理于 <b id="updatedAt"></b></span>
         <span class="freshness" id="freshness"></span>
@@ -42,8 +57,10 @@
 
     <div id="alertBar" class="alert-bar"></div>
 
-    <section class="filter-panel">
+    <section class="filter-panel" id="filterPanel">
       <input type="search" id="searchBox" placeholder="🔍 搜索公司 / 城市 / 岗位关键词…">
+      <!-- 手机端：分类与筛选默认收起，点这个按钮展开（桌面端隐藏） -->
+      <button id="filterToggle" class="filter-toggle" type="button">展开分类与筛选 ▾</button>
       <div class="filter-group" id="categoryFilters"></div>
       <div class="filter-row">
         <select id="cityFilter"><option value="">全部城市</option></select>
@@ -81,7 +98,7 @@
       <details class="legend-box">
         <summary>这些标记是什么意思</summary>
         <div class="legend">
-          <span><b class="tag verified">✓ 官网已实测</b> 该公司的官网链接由程序实测可访问（2026-10-16）</span>
+          <span><b class="tag verified">✓ 官网已实测</b> 该公司的官网链接由程序实测可访问<span id="legendVerifiedDate"></span></span>
           <span><b class="tag conf-低">来源：规律推算</b> 该公司不单独发公告，时间按同类机构往年规律推算</span>
           <span><b class="tag conf-中">来源：公开报道</b> 时间来自公开报道或官方招聘页</span>
           <span><b class="tag conf-高">来源：官方公告</b> 时间来自该单位官方公告</span>
@@ -160,7 +177,7 @@
   <div class="modal-body" id="modalBody"></div>
 </div>
 
-<script src="js/data.enc.js?v=4"></script>
-<script src="js/app.js?v=14"></script>
+<script src="js/data.enc.js?v=5"></script>
+<script src="js/app.js?v=16"></script>
 </body>
 </html>

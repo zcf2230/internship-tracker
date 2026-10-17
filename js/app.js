@@ -23,6 +23,45 @@
   /* ---------- 工具 ---------- */
   function $(s, el) { return (el || document).querySelector(s); }
   function $$(s, el) { return Array.prototype.slice.call((el || document).querySelectorAll(s)); }
+  /* ---------- 主题：浅色 / 深色 / 随系统 ----------
+     选择存在 localStorage（key: itr_theme），电脑手机各自记住自己的选择。
+     「随系统」由这里监听系统主题变化后代为切换，CSS 只认 <html data-theme>。 */
+  var THEME_KEY = "itr_theme";
+  function systemDark() {
+    return typeof matchMedia === "function" && matchMedia("(prefers-color-scheme: dark)").matches;
+  }
+  function savedTheme() {
+    try {
+      var t = localStorage.getItem(THEME_KEY) || "light";
+      return (t === "light" || t === "dark" || t === "auto") ? t : "light";
+    } catch (e) { return "light"; }
+  }
+  function applyTheme() {
+    var t = savedTheme();
+    document.documentElement.dataset.theme = t === "auto" ? (systemDark() ? "dark" : "light") : t;
+    $$("#themeSwitch button").forEach(function (b) {
+      b.classList.toggle("on", b.dataset.tv === t);
+    });
+  }
+  function setTheme(t) {
+    try { localStorage.setItem(THEME_KEY, t); } catch (e) {}
+    applyTheme();
+  }
+  // 脚本在 body 末尾执行，报头已存在：立即应用并绑定开关
+  applyTheme();
+  (function () {
+    var ts = document.getElementById("themeSwitch");
+    if (ts) ts.addEventListener("click", function (e) {
+      var b = e.target.closest("button[data-tv]");
+      if (b) setTheme(b.dataset.tv);
+    });
+    var mq = typeof matchMedia === "function" ? matchMedia("(prefers-color-scheme: dark)") : null;
+    if (mq) {
+      if (mq.addEventListener) mq.addEventListener("change", applyTheme);
+      else if (mq.addListener) mq.addListener(applyTheme);   // 旧 Safari
+    }
+  })();
+
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
@@ -419,7 +458,11 @@
     "中": "网申时间与用人要求来自公开报道或官方招聘页，非逐家官方公告",
     "低": "该公司不单独发公告，时间按同类机构往年规律推算；用人要求为同类机构通用规律"
   };
-  var VERIFIED_TITLE = "官网链接由程序实测可访问（HTTP 200 且页面出现公司名），实测日期 2026-10-16";
+  // 实测日期从数据里读（build-data 从 tools/links.json 的 verifiedAt 带进来），不再写死
+  function verifiedTitle() {
+    return "官网链接由程序实测可访问（HTTP 200 且页面出现公司名）" +
+      (DATA.verifiedAt ? "，实测日期 " + DATA.verifiedAt : "");
+  }
 
   /* ---------- 渲染：公司库 ---------- */
   function allCategories() {
@@ -486,7 +529,7 @@
       ? '<span class="tag conf-' + esc(c.confidence) + '" title="' + esc(CONF_TITLE[c.confidence] || "") + '">' +
         esc(CONF_LABEL[c.confidence] || ("来源：" + c.confidence)) + "</span>"
       : "";
-    var verified = c.linkVerified ? '<span class="tag verified" title="' + esc(VERIFIED_TITLE) + '">✓ 官网已实测</span>' : "";
+    var verified = c.linkVerified ? '<span class="tag verified" title="' + esc(verifiedTitle()) + '">✓ 官网已实测</span>' : "";
     // 每日自动巡检的结果（tools/ci-check-links.js 生成 js/link-status.json）：
     // 同一条官网连续 3 天连不上才提示，避免把「对方限制了程序访问」误报成失效。
     var ls = LINK_STATUS && LINK_STATUS.entries ? LINK_STATUS.entries[c.id] : null;
@@ -519,6 +562,43 @@
       "</div></div>";
   }
 
+  /* ---------- 筛选条件 <-> 网址（#hash）----------
+     让「杭州 + 银行 + 寒假实习」这种筛选结果可以直接把链接发给同学，
+     刷新 / 前进后退也不丢筛选。用 hash 而不是查询参数：不发额外请求，静态托管下最稳。 */
+  function filtersToHash() {
+    var p = [];
+    if (filters.q) p.push("q=" + encodeURIComponent(filters.q));
+    if (filters.cats.length) p.push("cats=" + encodeURIComponent(filters.cats.join("|")));
+    ["city", "batch", "degree", "test", "hz", "status"].forEach(function (k) {
+      if (filters[k]) p.push(k + "=" + encodeURIComponent(filters[k]));
+    });
+    return p.length ? "#" + p.join("&") : "";
+  }
+  function writeHash() {
+    var h = filtersToHash();
+    if (location.hash !== h) {
+      try { history.replaceState(null, "", location.pathname + location.search + h); } catch (e) { /* file:// 等环境忽略 */ }
+    }
+  }
+  function hashToFilters() {
+    var h = (location.hash || "").slice(1);
+    if (!h) return false;
+    var f = { q: "", cats: [], city: "", batch: "", degree: "", test: "", hz: "", status: "" };
+    var any = false;
+    h.split("&").forEach(function (kv) {
+      var i = kv.indexOf("=");
+      if (i < 0) return;
+      var k = kv.slice(0, i), v;
+      try { v = decodeURIComponent(kv.slice(i + 1)); } catch (e) { v = kv.slice(i + 1); }
+      if (k === "q" && v) { f.q = v; any = true; }
+      else if (k === "cats" && v) { f.cats = v.split("|"); any = true; }
+      else if (k in f && v) { f[k] = v; any = true; }
+    });
+    if (!any) return false;
+    filters = f;
+    return true;
+  }
+
   /* ---------- 列表渲染（渐进式）----------
      为什么分批：1064 张卡 = 约 2.8 万个 DOM 节点。一次性 innerHTML 写进去，浏览器要一口气
      做样式计算 + 布局 + 绘制，在 CPU 降速 4 倍（≈中端手机）下实测「输入一个字」要 3.5 秒、
@@ -538,6 +618,15 @@
   function renderList() {
     var gen = ++renderGen;
     filters.qLower = (filters.q || "").toLowerCase();   // 只转一次，别在每个公司上重复转
+    writeHash();
+    // 折叠按钮上的「已选 N 项」提示（手机端可见）
+    var ft = $("#filterToggle");
+    if (ft) {
+      var n = (filters.q ? 1 : 0) + filters.cats.length;
+      ["city", "batch", "degree", "test", "hz", "status"].forEach(function (k) { if (filters[k]) n++; });
+      var open = $("#filterPanel") && $("#filterPanel").classList.contains("open");
+      ft.textContent = (open ? "收起分类与筛选 ▴" : "展开分类与筛选 ▾") + (n ? "（已选 " + n + " 项）" : "");
+    }
     var list = DATA.companies.filter(matchCompany).sort(sortCompanies);
     $("#resultCount").innerHTML = (list.length === DATA.companies.length
       ? "共 <b>" + list.length + "</b> 家机构"
@@ -594,7 +683,7 @@
         "<br>📌 <b>网申时间与用人要求</b>：" + esc(CONF_LABEL[c.confidence] || "未标注") +
         (CONF_TITLE[c.confidence] ? "　<span>（" + esc(CONF_TITLE[c.confidence]) + "）</span>" : "") +
         "<br>🔗 <b>官网链接</b>：" +
-        (c.linkVerified ? "已由程序实测可访问（2026-10-16）"
+        (c.linkVerified ? "已由程序实测可访问" + (DATA.verifiedAt ? "（" + DATA.verifiedAt + "）" : "")
           : c.applyLink ? "来自公开资料整理，未逐条实测"
             : "未收录，请用卡片上的「🔍 搜官方入口」按钮查找") +
         "<br>⚠️ 以上为往年时间整理，投递前请以官方最新公告为准。</div>";
@@ -903,6 +992,13 @@
         invalidateTab("progress");
       }
     };
+    // 手机端筛选折叠开关
+    var ft = $("#filterToggle");
+    if (ft) ft.onclick = function () {
+      var panel = $("#filterPanel");
+      var open = panel.classList.toggle("open");
+      this.textContent = open ? "收起分类与筛选 ▴" : "展开分类与筛选 ▾";
+    };
     $("#modalMask").onclick = closeModal;
     document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeModal(); });
     $("#timelineCategory").onchange = renderTimeline;
@@ -919,15 +1015,41 @@
     $("#updatedAt").textContent = DATA.updatedAt || "整理中";
     // 数据行补 id
     DATA.companies.forEach(function (c, i) { if (!c.id) c.id = "c" + i; applyDefaults(c); });
+    var fromHash = hashToFilters();   // 从网址恢复筛选（要在 renderCategories 之前，chip 高亮依赖 filters.cats）
+    var lv = $("#legendVerifiedDate");
+    if (lv) lv.textContent = DATA.verifiedAt ? "（" + DATA.verifiedAt + "）" : "";
     renderFreshness();
     renderStatStrip();
     loadLinkStatus();
+    // 用户在同一个标签页里粘贴/切换带筛选的链接（或浏览器前进后退）时，重新应用筛选。
+    // 自己写入 hash 用的是 replaceState，不会触发 hashchange，所以这里没有回环。
+    window.addEventListener("hashchange", function () {
+      if (!hashToFilters()) return;
+      $("#searchBox").value = filters.q;
+      $("#cityFilter").value = filters.city;
+      $("#batchFilter").value = filters.batch;
+      $("#degreeFilter").value = filters.degree;
+      $("#testFilter").value = filters.test;
+      $("#cityHZFilter").value = filters.hz;
+      $("#statusFilter").value = filters.status;
+      renderList();
+    });
     try { kanbanCat = JSON.parse(localStorage.getItem(LS_KEY + "_kanbanCat")) || {}; } catch (e) { kanbanCat = {}; }
     // 只渲染首屏可见的「公司库」；其余 4 个页签等用户点过去再渲染（见 ensureTab）
     renderCategories();
     renderAlert();
     renderList();
     bindEvents();
+    // 网址里带了筛选条件：把控件值也回填上（chips 高亮已在 renderCategories 里还原）
+    if (fromHash) {
+      $("#searchBox").value = filters.q;
+      $("#cityFilter").value = filters.city;
+      $("#batchFilter").value = filters.batch;
+      $("#degreeFilter").value = filters.degree;
+      $("#testFilter").value = filters.test;
+      $("#cityHZFilter").value = filters.hz;
+      $("#statusFilter").value = filters.status;
+    }
     // 返回顶部
     var backTop = $("#backTop");
     window.addEventListener("scroll", function () {
