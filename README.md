@@ -38,6 +38,8 @@ node tools/build-data.js          # raw/*.json -> tools/data.json（合并 + 去
 node tools/encrypt-data.js        # data.json -> js/data.enc.js（**先 gzip 再 AES-256-GCM**，见下）
 node tools/check-data.js          # 自检：解密 + 核对条数与字段完整性 + 直链覆盖率 + 加密包体积守卫（无依赖）
 node tools/test-decrypt.js        # 自检：用与浏览器相同的 WebCrypto+DecompressionStream 走一遍解密链路（无依赖）
+node tools/patch-summer.js        # 把联网核实到的暑期批写进 raw/*.json（幂等：该家已有暑期批则覆盖这一条）
+node tools/check-summer.js        # 自检：暑期批家数与覆盖率 + 每条暑期窗口能否解析、是否落在暑假时间轴区间内
 node tools/ci-check-links.js      # 每日官网链接巡检（GitHub Actions 跑，也可本地手动跑；无依赖）
 ```
 
