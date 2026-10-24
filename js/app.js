@@ -5,6 +5,11 @@
   var DATA = window.DATA || { updatedAt: "", companies: [], channels: {}, guides: [] };
   var LS_KEY = "internship_progress_v1";
   var FAV_KEY = "internship_favorites_v1";
+  var SEASON_KEY = "itr_season_v1";
+  var activeSeason = "winter";
+  try {
+    activeSeason = localStorage.getItem(SEASON_KEY) === "summer" ? "summer" : "winter";
+  } catch (e) {}
   function loadFavorites() {
     try { return JSON.parse(localStorage.getItem(FAV_KEY)) || {}; } catch (e) { return {}; }
   }
@@ -78,6 +83,10 @@
   function parseOne(str, type) {
     if (!str) return null;
     var s = String(str).replace(/约|左右|2026年|2027年|每年|前后/g, "").trim();
+    // 少数条目以官方公告的确切日期开头（如 "2026-08-28（2027届批已启动）"），
+    // 这种直接按字面年份解析；只匹配开头，否则会把括号里的历史参照日期当成批次时间
+    var iso = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if (iso) return new Date(+iso[1], +iso[2] - 1, +iso[3]);
     // 支持「10月25日」这种确切日期；只写月份时沿用旧行为（按 10 号估算）
     var m = s.match(/(\d{1,2})\s*月(?:\s*(上旬|中旬|下旬|初|中|底|末)|\s*(\d{1,2})\s*日)?/);
     if (!m) return null;
@@ -101,11 +110,12 @@
     if (!open) return (isRolling(closeStr) || isUntilFilled(closeStr)) ? { rolling: true } : null;
     var close = parseOne(closeStr, type);
     if (!close && openStr) {
-      // open 里可能自带区间 "10月中旬-11月中旬"
       var parts = String(openStr).split(/[-—–~至]|到/);
       if (parts.length === 2) {
-        open = parseOne(parts[0], type);
-        close = parseOne(parts[1], type);
+        var left = parts[0], right = parts[1];
+        if (!/月/.test(left) && /月/.test(right)) left += "月";
+        var rangeOpen = parseOne(left, type), rangeClose = parseOne(right, type);
+        if (rangeOpen && rangeClose) { open = rangeOpen; close = rangeClose; }
       }
     }
     if (close && close < open) close = new Date(close.getFullYear() + 1, close.getMonth(), close.getDate());
@@ -114,10 +124,18 @@
   }
   function daysBetween(a, b) { return Math.round((b - a) / 86400000); }
 
+  function isSummerBatch(b) { return /暑期/.test(String((b && b.type) || "")); }
+  function summerBatches(c) { return (c.batches || []).filter(isSummerBatch); }
+  function seasonBatches(c) { return activeSeason === "summer" ? summerBatches(c) : (c.batches || []); }
+  function displayBatches(c) {
+    if (activeSeason === "summer") return summerBatches(c);
+    return c.batches || [];
+  }
+
   /* ---------- 公司状态计算 ---------- */
   function companyWindows(c) {
     var out = [];
-    (c.batches || []).forEach(function (b) {
+    seasonBatches(c).forEach(function (b) {
       var w = parseWindow(b.open, b.close, b.type);
       if (w) out.push({ batch: b, w: w });
     });
@@ -153,7 +171,7 @@
      实测：这一步把单次搜索的 JS 耗时从 ~900ms 降到几十毫秒。 */
   var STATUS_CACHE = Object.create(null);
   function statusOf(c) {
-    var k = c.id || c.name;
+    var k = activeSeason + ":" + (c.id || c.name);
     var s = STATUS_CACHE[k];
     if (!s) { s = STATUS_CACHE[k] = companyStatus(c); }
     return s;
@@ -396,6 +414,10 @@
 
   /* ---------- 筛选 ---------- */
   var filters = { q: "", cats: [], city: "", batch: "", degree: "", test: "", hz: "", status: "" };
+  function summerOnlyEnabled() {
+    var cb = $("#seasonOnly");
+    return activeSeason === "summer" && (!cb || cb.checked);
+  }
   // 一家公司可以在多个分类里出现：category 是主分类，tags 是附加分类
   // （例如宁波银行主分类是「银行/保险/信托」，同时挂了 tag「小而美公司」）
   function inCat(c, cat) {
@@ -417,6 +439,7 @@
   function matchCompany(c) {
     // 注意：这里不需要算状态。以前有一句 `var st = companyStatus(c)` 算完却没用，
     // 等于每敲一个字就白算 1064 次日期解析，已删除。
+    if (summerOnlyEnabled() && !summerBatches(c).length) return false;
     if (filters.q) {
       // 搜索用的「大字符串」按公司缓存一次。原来每敲一个字都要给 1064 家公司
       // 重新拼接 10 个字段再转小写（每次约 1MB 字符串分配），是输入卡顿的主因之一。
@@ -429,7 +452,7 @@
     }
     if (filters.city && (c.cities || []).indexOf(filters.city) < 0) return false;
     if (filters.batch) {
-      var has = (c.batches || []).some(function (b) { return b.type && b.type.indexOf(filters.batch) >= 0; });
+      var has = seasonBatches(c).some(function (b) { return b.type && b.type.indexOf(filters.batch) >= 0; });
       if (!has) return false;
     }
     if (filters.degree === "bachelor-ok" && !isBachelorOk(c)) return false;
@@ -486,19 +509,22 @@
 
   function renderCategories() {
     var cats = allCategories();
+    var categoryCompanies = activeSeason === "summer"
+      ? DATA.companies.filter(function (c) { return summerBatches(c).length > 0; })
+      : DATA.companies;
     // 分类条做成「目录」的样子：序号 + 名称 + 家数，比一排纯文字 chip 更好扫读
     $("#categoryFilters").innerHTML = cats.map(function (cat, i) {
       // 记住已选中的分类：分类条重建时要还原高亮，否则 UI 与 filters.cats 会不一致
       var on = filters.cats.indexOf(cat) >= 0 ? " active" : "";
       var n = 0;
-      for (var k = 0; k < DATA.companies.length; k++) { if (inCat(DATA.companies[k], cat)) n++; }
+      for (var k = 0; k < categoryCompanies.length; k++) { if (inCat(categoryCompanies[k], cat)) n++; }
       return '<button class="chip' + on + '" data-cat="' + esc(cat) + '">' +
         "<i>" + (i + 1 < 10 ? "0" : "") + (i + 1) + "</i>" +
         esc(cat) + "<b>" + n + "</b></button>";
     }).join("");
     // 城市下拉 = 高频真实城市 + 固定重点城市（含嘉兴），按岗位数排序
     var cityCount = {};
-    DATA.companies.forEach(function (c) {
+    categoryCompanies.forEach(function (c) {
       (c.cities || []).forEach(function (ct) {
         if (/全国|多地|以官网|以岗位|城市$/.test(ct)) return;
         cityCount[ct] = (cityCount[ct] || 0) + 1;
@@ -523,6 +549,11 @@
     if (isRolling(b.open)) win = "全年滚动 · 招满即止";
     else win = '<span class="win">' + esc(b.open || "?") + " ~ " + esc(b.close || "招满即止") + "</span>";
     return '<div class="batch-line"><b>' + esc(b.type) + "</b>：" + win + (b.note ? ' <span class="note">(' + esc(b.note) + ")</span>" : "") + "</div>";
+  }
+  function batchesHTML(c) {
+    var batches = displayBatches(c);
+    if (!batches.length && activeSeason === "summer") return '<div class="batch-line batch-missing">暂未收录暑期实习批次</div>';
+    return batches.map(batchLine).join("");
   }
 
   /* 单张卡片的 HTML。抽出来是为了能在渐进渲染里分批调用。 */
@@ -556,7 +587,7 @@
           ? '<span class="tag sb">小而美公司</span>' : "") + verified + conf + deadTag +
       "</div>" +
       '<span class="status-pill ' + statusClass(st) + '">' + statusLabel(st) + "</span></div>" +
-      '<div class="card-batches">' + (c.batches || []).map(batchLine).join("") + "</div>" +
+      '<div class="card-batches">' + batchesHTML(c) + "</div>" +
       '<div class="card-meta">' + meta.join("") + "</div>" +
       (extra ? '<div class="card-extra">' + extra + "</div>" : "") +
       '<div class="card-actions">' +
@@ -638,9 +669,13 @@
       ft.textContent = (open ? "收起分类与筛选 ▴" : "展开分类与筛选 ▾") + (n ? "（已选 " + n + " 项）" : "");
     }
     var list = DATA.companies.filter(matchCompany).sort(sortCompanies);
-    $("#resultCount").innerHTML = (list.length === DATA.companies.length
-      ? "共 <b>" + list.length + "</b> 家机构"
-      : "筛出 <b>" + list.length + "</b> 家 · 全库 " + DATA.companies.length + " 家");
+    var baseTotal = summerOnlyEnabled()
+      ? DATA.companies.filter(function (c) { return summerBatches(c).length > 0; }).length
+      : DATA.companies.length;
+    var baseLabel = summerOnlyEnabled() ? "已收录暑期批 " + baseTotal + " 家" : "全库 " + baseTotal + " 家";
+    $("#resultCount").innerHTML = (list.length === baseTotal
+      ? "共 <b>" + list.length + "</b> 家" + (summerOnlyEnabled() ? "已收录暑期批机构" : "机构")
+      : "筛出 <b>" + list.length + "</b> 家 · " + baseLabel);
     $("#emptyState").hidden = list.length > 0;
 
     var box = $("#companyList");
@@ -677,8 +712,8 @@
       "<h2>" + esc(c.name) + "</h2>" +
       '<span class="tag cat">' + esc(c.category) + " · " + esc(c.subcategory || "") + "</span> " +
       '<span class="status-pill ' + statusClass(st) + '">' + statusLabel(st) + "</span>" +
-      '<div class="detail-section"><h4>📅 网申批次（往年时间）</h4>' +
-        '<div class="card-batches">' + (c.batches || []).map(batchLine).join("") + "</div></div>" +
+      '<div class="detail-section"><h4>📅 ' + (activeSeason === "summer" ? "暑期实习批次" : "网申批次（往年时间）") + "</h4>" +
+        '<div class="card-batches">' + batchesHTML(c) + "</div></div>" +
       sec("🧭 机构信息", row("主营业务", c.biz) + row("适合投递方向", c.jobs) +
         row("规模量级", c.scale ? "≈ " + c.scale + "（按公开信息粗判，非精确人数）" : "") + row("备注", c.note)) +
       sec("🎓 用人要求", row("学历要求", c.degree) + row("专业方向", c.major) + row("证书", c.certs) +
@@ -703,15 +738,21 @@
   function closeModal() { $("#modal").hidden = true; }
 
   /* ---------- 渲染：时间轴 ---------- */
-  var TL_START = new Date(2026, 8, 1), TL_END = new Date(2027, 2, 28); // 2026-09 ~ 2027-03
-  var TL_SPAN = TL_END - TL_START;
-  function pct(d) { return Math.max(0, Math.min(100, ((d - TL_START) / TL_SPAN) * 100)); }
+  function timelineBounds() {
+    return activeSeason === "summer"
+      ? { start: new Date(2026, 7, 1), end: new Date(2027, 7, 31) }
+      : { start: new Date(2026, 8, 1), end: new Date(2027, 2, 28) };
+  }
+  function timelinePct(d, bounds) {
+    return Math.max(0, Math.min(100, ((d - bounds.start) / (bounds.end - bounds.start)) * 100));
+  }
   function renderTimeline() {
     var cat = $("#timelineCategory").value;
+    var bounds = timelineBounds();
     var list = DATA.companies.filter(function (c) { return !cat || inCat(c, cat); });
     list = list.filter(function (c) { return companyWindows(c).length > 0; });
     var months = [];
-    for (var m = new Date(2026, 8, 1); m <= TL_END; m.setMonth(m.getMonth() + 1)) {
+    for (var m = new Date(bounds.start.getTime()); m <= bounds.end; m.setMonth(m.getMonth() + 1)) {
       months.push(m.getFullYear() + "年" + (m.getMonth() + 1) + "月");
     }
     var html = '<div class="tl-months" style="grid-template-columns:repeat(' + months.length + ',1fr)">' +
@@ -722,7 +763,7 @@
         if (it.w.rolling) {
           return '<div class="tl-bar rolling" style="left:0;width:100%" data-goto="' + esc(c.id) + '" title="' + esc(it.batch.type) + ' 全年滚动">' + esc(it.batch.type) + " · 滚动</div>";
         }
-        var l = pct(it.w.open), r = it.w.close ? pct(it.w.close) : 100;
+        var l = timelinePct(it.w.open, bounds), r = it.w.close ? timelinePct(it.w.close, bounds) : 100;
         if (r <= 0 || l >= 100) return "";
         var cls = st.batch && st.batch.batch === it.batch && (st.state === "opening") ? " opening" : "";
         return '<div class="tl-bar' + cls + '" style="left:' + l.toFixed(1) + "%;width:" + Math.max(3, r - l).toFixed(1) + '%" data-goto="' + esc(c.id) + '" title="' + esc(it.batch.type + " " + it.batch.open + "~" + it.batch.close) + '">' + esc(it.batch.type) + "</div>";
@@ -831,20 +872,35 @@
   function renderStatStrip() {
     var box = $("#statStrip");
     if (!box) return;
-    var cs = DATA.companies;
+    var all = DATA.companies;
+    var cs = activeSeason === "summer"
+      ? all.filter(function (c) { return summerBatches(c).length > 0; })
+      : all;
     var open = 0;
-    for (var i = 0; i < cs.length; i++) { if (statusOf(cs[i]).state === "opening") open++; }
+    for (var i = 0; i < cs.length; i++) {
+      var state = statusOf(cs[i]).state;
+      if (state === "opening" || (activeSeason === "summer" && state === "rolling")) open++;
+    }
     var links = 0, verified = 0;
     cs.forEach(function (c) { if (c.applyLink) links++; if (c.linkVerified) verified++; });
     function item(label, val, accent) {
       return "<span" + (accent ? ' class="accent"' : "") + "><b>" + val + "</b>" + label + "</span>";
     }
-    var html =
-      item("家机构", cs.length) +
-      item("个分类", allCategories().length) +
-      item("家正在开放网申", open, true) +
-      item("条官网直链", links) +
-      item("条官网已实测", verified);
+    var html;
+    if (activeSeason === "summer") {
+      var coverage = all.length ? Math.round(cs.length / all.length * 100) : 0;
+      html = item("家已收录暑期批", cs.length) +
+        item("家暑期批预计开放", open, true) +
+        item("暑期数据覆盖率", coverage + "%") +
+        item("家有官网直链", links) +
+        item("家官网已实测", verified);
+    } else {
+      html = item("家机构", cs.length) +
+        item("个分类", allCategories().length) +
+        item("家正在开放网申", open, true) +
+        item("条官网直链", links) +
+        item("条官网已实测", verified);
+    }
     if (LINK_STATUS && LINK_STATUS.checkedAt) {
       var d = new Date(LINK_STATUS.checkedAt);
       if (!isNaN(d.getTime())) {
@@ -908,15 +964,54 @@
   function renderAlert() {
     var opening = [], soon = [];
     DATA.companies.forEach(function (c) {
+      if (activeSeason === "summer" && !summerBatches(c).length) return;
       var st = statusOf(c);
-      if (st.state === "opening") opening.push(c.name);
-      else if (st.state === "soon" && st.days != null && st.days <= 21) soon.push(c.name + "（约 " + st.days + " 天后开闸）");
+      if (st.state === "opening" || (activeSeason === "summer" && st.state === "rolling")) opening.push(c.name);
+      else if (st.state === "soon" && st.days != null && st.days <= (activeSeason === "summer" ? 45 : 21)) soon.push(c.name + "（约 " + st.days + " 天后开闸）");
     });
     var parts = [];
     if (opening.length) parts.push("<b>按往年时间，预计正在开放：</b>" + esc(opening.slice(0, 6).join("、")) + (opening.length > 6 ? " 等 " + opening.length + " 家" : ""));
     if (soon.length) parts.push("<b>近期预计开闸：</b>" + esc(soon.slice(0, 5).join("、")));
-    parts.push("现在正是<b>简历打磨 + 提前批网申</b>的窗口期，别等 11 月才动手。");
+    if (activeSeason === "summer") {
+      parts.push("外资暑期项目常从<b>前一年秋季</b>启动，国内机构多集中在<b>次年 2—5 月</b>，建议提前准备简历与笔面试。");
+    } else {
+      parts.push("现在正是<b>简历打磨 + 提前批网申</b>的窗口期，别等 11 月才动手。");
+    }
     $("#alertBar").innerHTML = "<ul><li>" + parts.join("</li><li>") + "</li></ul>";
+  }
+
+  function applySeasonUI() {
+    var summer = activeSeason === "summer";
+    document.documentElement.dataset.season = activeSeason;
+    document.title = "金融实习网申通 · 2027 " + (summer ? "暑假实习" : "寒假实习");
+    var subtitle = $("#seasonSubtitle");
+    if (subtitle) subtitle.textContent = "Finance Internship Tracker · 2027 " + (summer ? "暑假实习" : "寒假实习");
+    $$("#seasonSwitch button").forEach(function (b) {
+      b.classList.toggle("on", b.dataset.season === activeSeason);
+      b.setAttribute("aria-pressed", b.dataset.season === activeSeason ? "true" : "false");
+    });
+    var onlyWrap = $("#seasonOnlyWrap");
+    if (onlyWrap) onlyWrap.hidden = !summer;
+    var hint = $("#timelineHint");
+    if (hint) hint.innerHTML = summer
+      ? "根据<b>往年暑期实习时间</b>推算的 2026 年 8 月 — 2027 年 8 月窗口分布。点击色块查看机构详情。"
+      : "根据<b>往年网申时间</b>推算的 2026 年 9 月 — 2027 年 3 月窗口分布，虚线 = 全年滚动招聘。点击色块查看机构详情。";
+  }
+  function setSeason(season) {
+    if (season !== "winter" && season !== "summer") return;
+    activeSeason = season;
+    try { localStorage.setItem(SEASON_KEY, season); } catch (e) {}
+    filters.batch = "";
+    var batchFilter = $("#batchFilter");
+    if (batchFilter) batchFilter.value = "";
+    applySeasonUI();
+    renderCategories();
+    $("#cityFilter").value = filters.city;
+    renderStatStrip();
+    renderAlert();
+    invalidateTab("list");
+    invalidateTab("timeline");
+    invalidateTab("progress");
   }
 
   /* ---------- 标签页懒渲染 ----------
@@ -950,6 +1045,11 @@
 
   /* ---------- 事件绑定 ---------- */
   function bindEvents() {
+    $("#seasonSwitch").onclick = function (e) {
+      var b = e.target.closest("button[data-season]");
+      if (b && b.dataset.season !== activeSeason) setSeason(b.dataset.season);
+    };
+    $("#seasonOnly").onchange = function () { invalidateTab("list"); };
     $$(".tab").forEach(function (t) {
       t.onclick = function () {
         $$(".tab").forEach(function (x) { x.classList.remove("active"); });
@@ -1025,6 +1125,7 @@
     $("#updatedAt").textContent = DATA.updatedAt || "整理中";
     // 数据行补 id
     DATA.companies.forEach(function (c, i) { if (!c.id) c.id = "c" + i; applyDefaults(c); });
+    applySeasonUI();
     var fromHash = hashToFilters();   // 从网址恢复筛选（要在 renderCategories 之前，chip 高亮依赖 filters.cats）
     var lv = $("#legendVerifiedDate");
     if (lv) lv.textContent = DATA.verifiedAt ? "（" + DATA.verifiedAt + "）" : "";

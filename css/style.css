@@ -64,16 +64,19 @@ button { font-family: inherit; cursor: pointer; }
   text-transform: uppercase; margin-top: 6px;
 }
 .header-meta { text-align: right; font-size: 12.5px; color: var(--ink-3); line-height: 1.9; }
-/* 主题三档开关：浅色 / 深色 / 随系统，选择存在 localStorage（key: itr_theme） */
+.season-switch,
 .theme-switch {
   display: inline-flex; gap: 2px; background: var(--gray-soft);
-  border: 1px solid var(--line); border-radius: 999px; padding: 3px; margin-bottom: 10px;
+  border: 1px solid var(--line); border-radius: 999px; padding: 3px; margin: 0 0 10px 6px;
 }
+.season-switch button,
 .theme-switch button {
   border: none; background: none; padding: 4px 13px; border-radius: 999px;
   font-size: 12px; color: var(--ink-2); transition: background .15s, color .15s;
 }
+.season-switch button:hover,
 .theme-switch button:hover { color: var(--ink); }
+.season-switch button.on { background: var(--blue); color: #fff; font-weight: 700; }
 .theme-switch button.on { background: var(--card); color: var(--ink); font-weight: 600; box-shadow: var(--shadow); }
 .header-meta span { display: block; }
 .today { font-size: 13.5px; font-weight: 700; color: var(--ink); }
@@ -130,6 +133,12 @@ button { font-family: inherit; cursor: pointer; }
 }
 #searchBox::placeholder { color: var(--ink-3); }
 #searchBox:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(23, 107, 117, .1); }
+.season-only {
+  display: inline-flex; align-items: center; gap: 7px; margin: -2px 0 12px 4px;
+  color: var(--ink-2); font-size: 12.5px; cursor: pointer;
+}
+.season-only[hidden] { display: none; }
+.season-only input { width: 15px; height: 15px; accent-color: var(--blue); }
 
 .filter-group { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 12px; }
 /* 手机端「展开分类与筛选」开关：默认隐藏，≤640px 显示并收起分类/筛选行 */
@@ -234,6 +243,7 @@ button { font-family: inherit; cursor: pointer; }
 
 .card-batches { margin: 8px 0 4px; font-size: 13.5px; color: var(--ink-2); }
 .card-batches .batch-line { margin: 2px 0; }
+.card-batches .batch-missing { color: var(--ink-3); font-style: italic; }
 .card-batches b { color: var(--ink); font-weight: 600; }
 .card-batches .win { font-family: var(--mono); font-size: 12.5px; color: var(--blue); }
 .card-meta { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12.5px; color: var(--ink-2); margin: 7px 0 10px; }
@@ -418,6 +428,7 @@ button { font-family: inherit; cursor: pointer; }
   .subtitle { font-size: 10.5px; letter-spacing: 1.8px; }
   .header-inner { justify-content: flex-start; }
   .header-meta { text-align: left; }
+  .season-switch, .theme-switch { margin-left: 0; margin-right: 6px; }
   .stat-strip > span { padding-right: 12px; margin-right: 12px; }
   .detail-grid { grid-template-columns: 1fr; }
   .detail-grid dt { margin-top: 8px; }
@@ -461,6 +472,7 @@ html[data-theme="dark"] {
 
 /* 浅色态里「深底白字」的组件，深色下 --ink 变亮了，文字要跟着翻成深色 */
 html[data-theme="dark"] .tab.active { color: var(--bg); }
+html[data-theme="dark"] .season-switch button.on,
 html[data-theme="dark"] .chip.active { color: #10282b; }
 html[data-theme="dark"] .chip.active i,
 html[data-theme="dark"] .chip.active b { color: rgba(16, 40, 43, .65); }

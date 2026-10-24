@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="light dark">
 <title>金融实习网申通 · 2027 寒假实习</title>
-<meta name="description" content="各大券商、基金、银行、四大、咨询、大厂实习生招聘网申时间、用人要求、笔试提醒一站式查询">
+<meta name="description" content="各大券商、基金、银行、四大、咨询、大厂寒假与暑期实习招聘网申时间、用人要求、笔试提醒一站式查询">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
 <script>
 /* 在样式表生效前把主题定好，避免深色用户看到一闪而过的白屏（FOUC） */
@@ -14,9 +14,12 @@ try {
   if (__t === "auto") __t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
   if (__t !== "light" && __t !== "dark") __t = "light";
   document.documentElement.dataset.theme = __t;
+  var __s = localStorage.getItem("itr_season_v1") === "summer" ? "summer" : "winter";
+  document.documentElement.dataset.season = __s;
+  document.title = "金融实习网申通 · 2027 " + (__s === "summer" ? "暑假实习" : "寒假实习");
 } catch (e) {}
 </script>
-<link rel="stylesheet" href="css/style.css?v=13">
+<link rel="stylesheet" href="css/style.css?v=14">
 </head>
 <body>
 
@@ -26,9 +29,13 @@ try {
       <div class="brand">
         <span class="logo">📈</span>
         <h1>金融实习网申通</h1>
-        <p class="subtitle">Finance Internship Tracker · 2027 寒假实习</p>
+        <p class="subtitle" id="seasonSubtitle">Finance Internship Tracker · 2027 寒假实习</p>
       </div>
       <div class="header-meta">
+        <div class="season-switch" id="seasonSwitch" role="group" aria-label="实习季节">
+          <button type="button" data-season="winter">寒假</button>
+          <button type="button" data-season="summer">暑假</button>
+        </div>
         <div class="theme-switch" id="themeSwitch" role="group" aria-label="界面主题">
           <button type="button" data-tv="light">浅色</button>
           <button type="button" data-tv="dark">深色</button>
@@ -59,6 +66,9 @@ try {
 
     <section class="filter-panel" id="filterPanel">
       <input type="search" id="searchBox" placeholder="🔍 搜索公司 / 城市 / 岗位关键词…">
+      <label class="season-only" id="seasonOnlyWrap" hidden>
+        <input type="checkbox" id="seasonOnly" checked> 只看已收录暑期批的机构
+      </label>
       <!-- 手机端：分类与筛选默认收起，点这个按钮展开（桌面端隐藏） -->
       <button id="filterToggle" class="filter-toggle" type="button">展开分类与筛选 ▾</button>
       <div class="filter-group" id="categoryFilters"></div>
@@ -114,7 +124,7 @@ try {
 <!-- ===================== 时间轴 ===================== -->
 <main id="tab-timeline" class="tab-pane">
   <div class="container">
-    <p class="hint">根据<b>往年网申时间</b>推算的 2026 年 9 月 — 2027 年 3 月窗口分布，虚线 = 全年滚动招聘。点击色块回到该公司卡片。</p>
+    <p class="hint" id="timelineHint">根据<b>往年网申时间</b>推算的 2026 年 9 月 — 2027 年 3 月窗口分布，虚线 = 全年滚动招聘。点击色块回到该公司卡片。</p>
     <div class="timeline-controls">
       <select id="timelineCategory"><option value="">全部行业</option></select>
     </div>
@@ -177,7 +187,7 @@ try {
   <div class="modal-body" id="modalBody"></div>
 </div>
 
-<script src="js/data.enc.js?v=5"></script>
-<script src="js/app.js?v=16"></script>
+<script src="js/data.enc.js?v=6"></script>
+<script src="js/app.js?v=18"></script>
 </body>
 </html>
