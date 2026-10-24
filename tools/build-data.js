@@ -154,7 +154,7 @@ const guidesFile = path.join(RAW, "guides.json");
 if (fs.existsSync(guidesFile)) guides = JSON.parse(fs.readFileSync(guidesFile, "utf8"));
 
 const data = {
-  updatedAt: "2026-10-16",
+  updatedAt: "2026-10-24",
   // 官网直链最近一次实测日期（tools/verify-links.js 写在 links.json 里），页面标记用它
   verifiedAt: LINK_VERIFIED_AT || null,
   companies, channels, guides

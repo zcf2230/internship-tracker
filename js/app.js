@@ -78,21 +78,27 @@
   function parseOne(str, type) {
     if (!str) return null;
     var s = String(str).replace(/约|左右|2026年|2027年|每年|前后/g, "").trim();
-    var m = s.match(/(\d{1,2})\s*月(?:\s*(上旬|中旬|下旬|初|中|底|末))?/);
+    // 支持「10月25日」这种确切日期；只写月份时沿用旧行为（按 10 号估算）
+    var m = s.match(/(\d{1,2})\s*月(?:\s*(上旬|中旬|下旬|初|中|底|末)|\s*(\d{1,2})\s*日)?/);
     if (!m) return null;
-    var month = parseInt(m[1], 10), day = m[2] ? DAY_OF[m[2]] : 10;
+    var month = parseInt(m[1], 10);
+    var day = m[2] ? DAY_OF[m[2]] : (m[3] ? parseInt(m[3], 10) : 10);
     if (!day) day = 15;
     var year;
-    if (type && type.indexOf("暑期") >= 0) year = month >= 9 ? 2026 : 2027;
+    // 2027 届秋招最早 6 月就启动，整个申请季都在 2026 年；跨年的截止日由 parseWindow 顺延
+    if (/秋招|校招|校园招聘/.test(String(type || ""))) year = 2026;
+    else if (type && type.indexOf("暑期") >= 0) year = month >= 9 ? 2026 : 2027;
     else year = month >= 9 ? 2026 : 2027; // 9-12月属2026年申请季，1-8月属2027年
     return new Date(year, month - 1, day);
   }
-  function isRolling(str) { return /全年|滚动|长期|招满即止|随时|常年在招/.test(String(str || "")); }
+  function isRolling(str) { return /全年|滚动|长期|随时|常年在招/.test(String(str || "")); }
+  // 「招满即止」是截止方式，不是截止日期：这类批次应保持「开放中」，不能按一个月后自动判为已截止
+  function isUntilFilled(str) { return /招满即止|额满即止|岗位满即止/.test(String(str || "")); }
   // 解析一个批次的窗口 -> {open:Date, close:Date, rolling:bool}
   function parseWindow(openStr, closeStr, type) {
-    if (isRolling(openStr) || isRolling(closeStr)) return { rolling: true };
+    if (isRolling(openStr)) return { rolling: true };
     var open = parseOne(openStr, type);
-    if (!open) return null;
+    if (!open) return (isRolling(closeStr) || isUntilFilled(closeStr)) ? { rolling: true } : null;
     var close = parseOne(closeStr, type);
     if (!close && openStr) {
       // open 里可能自带区间 "10月中旬-11月中旬"
@@ -103,7 +109,8 @@
       }
     }
     if (close && close < open) close = new Date(close.getFullYear() + 1, close.getMonth(), close.getDate());
-    return { open: open, close: close || (open ? new Date(open.getFullYear(), open.getMonth() + 1, open.getDate()) : null), rolling: false };
+    var untilFilled = !close && isUntilFilled(closeStr);
+    return { open: open, close: close || (untilFilled ? null : new Date(open.getFullYear(), open.getMonth() + 1, open.getDate())), rolling: false, untilFilled: untilFilled };
   }
   function daysBetween(a, b) { return Math.round((b - a) / 86400000); }
 
@@ -167,7 +174,10 @@
   }
   function statusLabel(st) {
     switch (st.state) {
-      case "opening": return "预计开放中";
+      case "opening":
+        if (st.days == null) return "预计开放中";
+        if (st.days <= 0) return "今天截止";
+        return st.days <= 30 ? "预计开放中 · 剩 " + st.days + " 天" : "预计开放中";
       case "rolling": return "常年滚动招聘";
       case "soon": return st.days === 0 ? "预计即将开放" : "约 " + st.days + " 天后开放";
       case "closed": return "往年批次已截止";
@@ -510,8 +520,8 @@
 
   function batchLine(b) {
     var win;
-    if (isRolling(b.open) || isRolling(b.close)) win = "全年滚动 · 招满即止";
-    else win = '<span class="win">' + esc(b.open || "?") + " ~ " + esc(b.close || "?") + "</span>";
+    if (isRolling(b.open)) win = "全年滚动 · 招满即止";
+    else win = '<span class="win">' + esc(b.open || "?") + " ~ " + esc(b.close || "招满即止") + "</span>";
     return '<div class="batch-line"><b>' + esc(b.type) + "</b>：" + win + (b.note ? ' <span class="note">(' + esc(b.note) + ")</span>" : "") + "</div>";
   }
 
@@ -712,7 +722,7 @@
         if (it.w.rolling) {
           return '<div class="tl-bar rolling" style="left:0;width:100%" data-goto="' + esc(c.id) + '" title="' + esc(it.batch.type) + ' 全年滚动">' + esc(it.batch.type) + " · 滚动</div>";
         }
-        var l = pct(it.w.open), r = pct(it.w.close);
+        var l = pct(it.w.open), r = it.w.close ? pct(it.w.close) : 100;
         if (r <= 0 || l >= 100) return "";
         var cls = st.batch && st.batch.batch === it.batch && (st.state === "opening") ? " opening" : "";
         return '<div class="tl-bar' + cls + '" style="left:' + l.toFixed(1) + "%;width:" + Math.max(3, r - l).toFixed(1) + '%" data-goto="' + esc(c.id) + '" title="' + esc(it.batch.type + " " + it.batch.open + "~" + it.batch.close) + '">' + esc(it.batch.type) + "</div>";
