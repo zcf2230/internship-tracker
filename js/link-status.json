@@ -1,143 +1,167 @@
 {
- "checkedAt": "2026-11-16T10:02:07.407Z",
+ "checkedAt": "2026-11-17T10:59:34.125Z",
  "summary": {
   "total": 567,
-  "ok": 545,
-  "warn": 6,
+  "ok": 541,
+  "warn": 10,
   "bad": 16
  },
  "entries": {
+  "brokers-5": {
+   "s": "warn",
+   "f": 1,
+   "first": "2026-11-17",
+   "why": "ETIMEDOUT"
+  },
   "dachang-18": {
    "s": "bad",
-   "f": 23,
+   "f": 24,
    "first": "2026-10-25",
    "why": "ECONNRESET"
   },
   "region-4": {
    "s": "bad",
-   "f": 6,
+   "f": 7,
    "first": "2026-11-11",
    "why": "ETIMEDOUT"
   },
+  "funds-10": {
+   "s": "warn",
+   "f": 1,
+   "first": "2026-11-17",
+   "why": "超时"
+  },
   "brokers2-1": {
    "s": "bad",
-   "f": 23,
+   "f": 24,
    "first": "2026-10-25",
    "why": "ETIMEDOUT"
   },
   "brokers2-4": {
    "s": "bad",
-   "f": 19,
+   "f": 20,
    "first": "2026-10-29",
-   "why": "ETIMEDOUT"
-  },
-  "soe-0": {
-   "s": "warn",
-   "f": 1,
-   "first": "2026-11-16",
    "why": "ETIMEDOUT"
   },
   "banks-24": {
    "s": "bad",
-   "f": 23,
+   "f": 24,
    "first": "2026-10-25",
    "why": "超时"
   },
   "big4-10": {
    "s": "bad",
-   "f": 23,
+   "f": 24,
    "first": "2026-10-25",
    "why": "超时"
   },
   "big4-12": {
    "s": "bad",
-   "f": 31,
+   "f": 32,
    "first": "2026-10-17",
    "why": "超时"
   },
+  "soe-0": {
+   "s": "warn",
+   "f": 2,
+   "first": "2026-11-16",
+   "why": "ETIMEDOUT"
+  },
   "smallbeauty-236": {
    "s": "bad",
-   "f": 23,
+   "f": 24,
    "first": "2026-10-25",
+   "why": "ETIMEDOUT"
+  },
+  "smallbeauty-251": {
+   "s": "warn",
+   "f": 1,
+   "first": "2026-11-17",
+   "why": "ETIMEDOUT"
+  },
+  "brokers2-2": {
+   "s": "warn",
+   "f": 1,
+   "first": "2026-11-17",
+   "why": "超时"
+  },
+  "smallbeauty-238": {
+   "s": "warn",
+   "f": 1,
+   "first": "2026-11-17",
+   "why": "超时"
+  },
+  "smallbeauty-510": {
+   "s": "warn",
+   "f": 1,
+   "first": "2026-11-17",
    "why": "ETIMEDOUT"
   },
   "more-16": {
    "s": "bad",
-   "f": 24,
+   "f": 25,
    "first": "2026-10-24",
-   "why": "ETIMEDOUT"
+   "why": "ECONNREFUSED"
   },
   "smallbeauty-272": {
    "s": "bad",
-   "f": 23,
+   "f": 24,
    "first": "2026-10-25",
+   "why": "超时"
+  },
+  "more-57": {
+   "s": "warn",
+   "f": 1,
+   "first": "2026-11-17",
    "why": "超时"
   },
   "more-40": {
    "s": "bad",
-   "f": 23,
+   "f": 24,
    "first": "2026-10-25",
    "why": "超时"
   },
   "more-120": {
    "s": "bad",
-   "f": 23,
+   "f": 24,
    "first": "2026-10-25",
    "why": "超时"
   },
-  "more-273": {
+  "more-177": {
    "s": "bad",
-   "f": 23,
-   "first": "2026-10-25",
+   "f": 14,
+   "first": "2026-11-04",
    "why": "ETIMEDOUT"
   },
   "more-181": {
    "s": "warn",
-   "f": 1,
+   "f": 2,
    "first": "2026-11-16",
    "why": "超时"
   },
-  "more-189": {
-   "s": "warn",
-   "f": 1,
-   "first": "2026-11-16",
-   "why": "超时"
+  "more-273": {
+   "s": "bad",
+   "f": 24,
+   "first": "2026-10-25",
+   "why": "ETIMEDOUT"
   },
   "more-277": {
    "s": "bad",
-   "f": 24,
+   "f": 25,
    "first": "2026-10-24",
    "why": "ETIMEDOUT"
   },
   "more-284": {
    "s": "bad",
-   "f": 23,
+   "f": 24,
    "first": "2026-10-25",
    "why": "ECONNRESET"
   },
-  "more-199": {
-   "s": "warn",
-   "f": 1,
-   "first": "2026-11-16",
-   "why": "超时"
-  },
   "more-302": {
    "s": "warn",
-   "f": 1,
+   "f": 2,
    "first": "2026-11-16",
    "why": "ECONNRESET"
-  },
-  "more-259": {
-   "s": "warn",
-   "f": 1,
-   "first": "2026-11-16",
-   "why": "超时"
-  },
-  "more-177": {
-   "s": "bad",
-   "f": 13,
-   "first": "2026-11-04",
-   "why": "超时"
   }
  }
 }
