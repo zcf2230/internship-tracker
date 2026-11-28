@@ -1,365 +1,173 @@
 {
- "checkedAt": "2026-11-27T11:10:59.890Z",
+ "checkedAt": "2026-11-28T10:45:23.317Z",
  "summary": {
   "total": 567,
-  "ok": 508,
-  "warn": 39,
-  "bad": 20
+  "ok": 540,
+  "warn": 11,
+  "bad": 16
  },
  "entries": {
   "brokers-4": {
    "s": "warn",
-   "f": 1,
-   "first": "2026-11-27",
-   "why": "ETIMEDOUT"
-  },
-  "brokers-7": {
-   "s": "warn",
-   "f": 1,
-   "first": "2026-11-27",
-   "why": "ETIMEDOUT"
-  },
-  "funds-0": {
-   "s": "warn",
-   "f": 1,
+   "f": 2,
    "first": "2026-11-27",
    "why": "ETIMEDOUT"
   },
   "banks-16": {
    "s": "warn",
-   "f": 1,
-   "first": "2026-11-27",
-   "why": "ETIMEDOUT"
-  },
-  "banks-21": {
-   "s": "warn",
-   "f": 1,
+   "f": 2,
    "first": "2026-11-27",
    "why": "ETIMEDOUT"
   },
   "big4-14": {
    "s": "warn",
-   "f": 1,
+   "f": 2,
    "first": "2026-11-27",
+   "why": "ETIMEDOUT"
+  },
+  "dachang-20": {
+   "s": "warn",
+   "f": 1,
+   "first": "2026-11-28",
    "why": "ETIMEDOUT"
   },
   "region-4": {
    "s": "bad",
-   "f": 17,
+   "f": 18,
    "first": "2026-11-11",
    "why": "ETIMEDOUT"
   },
-  "region-6": {
+  "dachang-18": {
    "s": "bad",
-   "f": 3,
-   "first": "2026-11-25",
-   "why": "ETIMEDOUT"
+   "f": 35,
+   "first": "2026-10-25",
+   "why": "ECONNRESET"
   },
   "brokers2-1": {
    "s": "bad",
-   "f": 34,
+   "f": 35,
    "first": "2026-10-25",
    "why": "ETIMEDOUT"
   },
   "brokers2-4": {
    "s": "bad",
-   "f": 30,
+   "f": 31,
    "first": "2026-10-29",
-   "why": "ETIMEDOUT"
-  },
-  "buyout-7": {
-   "s": "warn",
-   "f": 1,
-   "first": "2026-11-27",
-   "why": "ETIMEDOUT"
-  },
-  "dachang-18": {
-   "s": "bad",
-   "f": 34,
-   "first": "2026-10-25",
-   "why": "ECONNRESET"
-  },
-  "soe-1": {
-   "s": "warn",
-   "f": 2,
-   "first": "2026-11-26",
    "why": "ETIMEDOUT"
   },
   "soe-0": {
    "s": "bad",
-   "f": 12,
+   "f": 13,
    "first": "2026-11-16",
+   "why": "ETIMEDOUT"
+  },
+  "smallbeauty-196": {
+   "s": "warn",
+   "f": 1,
+   "first": "2026-11-28",
    "why": "ETIMEDOUT"
   },
   "big4-12": {
    "s": "bad",
-   "f": 42,
+   "f": 43,
    "first": "2026-10-17",
    "why": "超时"
   },
   "big4-10": {
    "s": "bad",
-   "f": 34,
+   "f": 35,
    "first": "2026-10-25",
    "why": "超时"
   },
-  "smallbeauty-200": {
-   "s": "warn",
-   "f": 1,
-   "first": "2026-11-27",
-   "why": "ETIMEDOUT"
-  },
-  "smallbeauty-198": {
-   "s": "warn",
-   "f": 2,
-   "first": "2026-11-26",
-   "why": "ETIMEDOUT"
-  },
-  "smallbeauty-211": {
-   "s": "warn",
-   "f": 1,
-   "first": "2026-11-27",
-   "why": "ETIMEDOUT"
-  },
-  "smallbeauty-213": {
-   "s": "warn",
-   "f": 1,
-   "first": "2026-11-27",
-   "why": "ETIMEDOUT"
-  },
-  "smallbeauty-223": {
-   "s": "warn",
-   "f": 2,
-   "first": "2026-11-26",
-   "why": "ETIMEDOUT"
-  },
-  "smallbeauty-233": {
-   "s": "warn",
-   "f": 1,
-   "first": "2026-11-27",
-   "why": "ETIMEDOUT"
-  },
   "smallbeauty-236": {
    "s": "bad",
-   "f": 34,
+   "f": 35,
    "first": "2026-10-25",
-   "why": "ETIMEDOUT"
-  },
-  "smallbeauty-241": {
-   "s": "warn",
-   "f": 2,
-   "first": "2026-11-26",
-   "why": "ETIMEDOUT"
-  },
-  "smallbeauty-257": {
-   "s": "warn",
-   "f": 1,
-   "first": "2026-11-27",
-   "why": "ETIMEDOUT"
-  },
-  "smallbeauty-258": {
-   "s": "warn",
-   "f": 1,
-   "first": "2026-11-27",
-   "why": "ETIMEDOUT"
-  },
-  "smallbeauty-494": {
-   "s": "warn",
-   "f": 2,
-   "first": "2026-11-26",
-   "why": "ETIMEDOUT"
-  },
-  "smallbeauty-499": {
-   "s": "warn",
-   "f": 1,
-   "first": "2026-11-27",
-   "why": "ETIMEDOUT"
-  },
-  "smallbeauty-500": {
-   "s": "warn",
-   "f": 1,
-   "first": "2026-11-27",
-   "why": "ETIMEDOUT"
-  },
-  "smallbeauty-510": {
-   "s": "bad",
-   "f": 3,
-   "first": "2026-11-25",
    "why": "ETIMEDOUT"
   },
   "more-16": {
    "s": "bad",
-   "f": 35,
+   "f": 36,
    "first": "2026-10-24",
    "why": "ECONNREFUSED"
   },
-  "more-58": {
-   "s": "warn",
-   "f": 1,
-   "first": "2026-11-27",
-   "why": "ETIMEDOUT"
-  },
-  "more-97": {
+  "banks-21": {
    "s": "warn",
    "f": 2,
-   "first": "2026-11-26",
-   "why": "ETIMEDOUT"
+   "first": "2026-11-27",
+   "why": "超时"
   },
-  "more-101": {
+  "more-89": {
    "s": "warn",
    "f": 1,
-   "first": "2026-11-27",
-   "why": "ETIMEDOUT"
-  },
-  "more-116": {
-   "s": "bad",
-   "f": 3,
-   "first": "2026-11-25",
-   "why": "ETIMEDOUT"
-  },
-  "more-119": {
-   "s": "warn",
-   "f": 1,
-   "first": "2026-11-27",
-   "why": "ETIMEDOUT"
-  },
-  "more-133": {
-   "s": "warn",
-   "f": 1,
-   "first": "2026-11-27",
-   "why": "ETIMEDOUT"
-  },
-  "more-135": {
-   "s": "warn",
-   "f": 2,
-   "first": "2026-11-26",
-   "why": "ETIMEDOUT"
-  },
-  "more-161": {
-   "s": "warn",
-   "f": 1,
-   "first": "2026-11-27",
+   "first": "2026-11-28",
    "why": "ETIMEDOUT"
   },
   "more-40": {
    "s": "bad",
-   "f": 34,
+   "f": 35,
    "first": "2026-10-25",
    "why": "超时"
   },
   "smallbeauty-272": {
    "s": "bad",
-   "f": 34,
+   "f": 35,
    "first": "2026-10-25",
    "why": "超时"
-  },
-  "more-190": {
-   "s": "bad",
-   "f": 3,
-   "first": "2026-11-25",
-   "why": "ETIMEDOUT"
   },
   "more-120": {
    "s": "bad",
-   "f": 34,
+   "f": 35,
    "first": "2026-10-25",
    "why": "超时"
   },
-  "more-213": {
-   "s": "warn",
-   "f": 2,
-   "first": "2026-11-26",
-   "why": "ETIMEDOUT"
-  },
-  "more-214": {
-   "s": "warn",
-   "f": 2,
-   "first": "2026-11-26",
-   "why": "ETIMEDOUT"
-  },
-  "more-189": {
+  "more-176": {
    "s": "warn",
    "f": 1,
-   "first": "2026-11-27",
+   "first": "2026-11-28",
    "why": "超时"
   },
-  "more-202": {
+  "more-177": {
+   "s": "bad",
+   "f": 25,
+   "first": "2026-11-04",
+   "why": "ETIMEDOUT"
+  },
+  "more-181": {
    "s": "warn",
    "f": 1,
-   "first": "2026-11-27",
+   "first": "2026-11-28",
    "why": "超时"
   },
   "more-273": {
    "s": "bad",
-   "f": 8,
+   "f": 9,
    "first": "2026-11-20",
    "why": "ETIMEDOUT"
   },
   "more-277": {
    "s": "bad",
-   "f": 35,
+   "f": 36,
    "first": "2026-10-24",
-   "why": "ETIMEDOUT"
-  },
-  "more-279": {
-   "s": "warn",
-   "f": 2,
-   "first": "2026-11-26",
    "why": "ETIMEDOUT"
   },
   "more-284": {
    "s": "bad",
-   "f": 34,
+   "f": 35,
    "first": "2026-10-25",
    "why": "ECONNRESET"
   },
-  "more-300": {
+  "more-233": {
    "s": "warn",
    "f": 1,
-   "first": "2026-11-27",
-   "why": "ETIMEDOUT"
+   "first": "2026-11-28",
+   "why": "超时"
   },
   "more-302": {
    "s": "warn",
-   "f": 1,
+   "f": 2,
    "first": "2026-11-27",
    "why": "ECONNRESET"
-  },
-  "more-311": {
-   "s": "warn",
-   "f": 1,
-   "first": "2026-11-27",
-   "why": "ETIMEDOUT"
-  },
-  "more-314": {
-   "s": "warn",
-   "f": 1,
-   "first": "2026-11-27",
-   "why": "ETIMEDOUT"
-  },
-  "more-177": {
-   "s": "bad",
-   "f": 24,
-   "first": "2026-11-04",
-   "why": "超时"
-  },
-  "more-329": {
-   "s": "warn",
-   "f": 1,
-   "first": "2026-11-27",
-   "why": "ETIMEDOUT"
-  },
-  "more-259": {
-   "s": "warn",
-   "f": 1,
-   "first": "2026-11-27",
-   "why": "超时"
-  },
-  "more-195": {
-   "s": "warn",
-   "f": 1,
-   "first": "2026-11-27",
-   "why": "超时"
   }
  }
 }
